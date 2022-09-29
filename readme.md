@@ -1,4 +1,4 @@
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/uwidcit/flaskmvc)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/octak/azure)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ![Tests](https://github.com/uwidcit/flaskmvc/actions/workflows/dev.yml/badge.svg)
@@ -156,7 +156,7 @@ $ coverage html
 
 ## Views 404ing
 
-If your newly created views are returning 404 ensure that they are added to the list in main.py.
+If your newly created views are returning 404, ensure that they are added to the list in main.py.
 
 ```python
 from App.views import (
@@ -171,10 +171,10 @@ views = [
 ]
 ```
 
-## Cannot Update Workflow file
+## Cannot Update Workflow File
 
-If you are running into errors in gitpod when updateding your github actions file, ensure your [github permissions](https://gitpod.io/integrations) in gitpod has workflow enabled ![perms](./images/gitperms.png)
+If you are running into errors in Gitpod when updating your github actions file, ensure your [github permissions](https://gitpod.io/integrations) in gitpod has workflow enabled ![perms](./images/gitperms.png)
 
 ## Database Issues
 
-If you are adding models you may need to migrate the database with the commands given in the previous database migration section. Alternateively you can delete you database file.
+If you are adding models you may need to migrate the database with the commands given in the previous database migration section. Alternatively, you can delete your database file.
