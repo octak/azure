@@ -1,13 +1,14 @@
+import sys
+
 import click
 import pytest
-import sys
 from flask import Flask
-from flask.cli import with_appcontext, AppGroup
+from flask.cli import AppGroup, with_appcontext
 
-from App.database import create_db, get_migrate
-from App.main import create_app
 # from App.controllers import ( create_user, get_all_users_json, get_all_users, upload_image)
 from App.controllers import *
+from App.database import create_db, get_migrate
+from App.main import create_app
 
 # This commands file allow you to create convenient CLI commands for testing controllers
 
@@ -69,6 +70,15 @@ def upload_command(username, url):
         print(f'User `{username}` does not exist.')
         return
     upload_image(user.id, url)
+
+@user_cli.command("displayUserPics", help="Displays all a users profile pictures")
+@click.argument("username")
+def displayUserPics_command(username):
+    user = get_user_by_username(username)
+    if not user:
+        print(f'User `{username}` does not exist.')
+        return
+    print(get_all_pictures_json())
 
 
 '''

@@ -1,5 +1,6 @@
 from App.database import db
 
+
 class Picture(db.Model):
     # Fields
     id = db.Column(db.Integer, primary_key=True)
@@ -12,20 +13,17 @@ class Picture(db.Model):
     #Relationship Stuff
     uploader_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def __init__(self, url):
-        self.url = url
-
     def __repr__(self):
-        return f'[url={self.url}, uploader={self.uploader_id}'
+        return f'Picture: [url={self.url}, uploader={self.uploader_id}]'
 
     def toJSON(self):
         return {
             'id': self.id,
-            'user_id': self.user_id,
+            'uploader-id': self.uploader_id,
             'url': self.url,
-            'total-ratings': self.total_ratings,
-            'total-stars': self.total_stars,
-            'average-rating': self.avg_rating,
+            'times-rated': self.times_rated,
+            'total-rating': self.total_rating,
+            'average-rating': self.average_rating,
         }
 
     def recieve_rating(self, rating):
