@@ -1,10 +1,13 @@
-import click, pytest, sys
+import click
+import pytest
+import sys
 from flask import Flask
 from flask.cli import with_appcontext, AppGroup
 
 from App.database import create_db, get_migrate
 from App.main import create_app
-from App.controllers import ( create_user, get_all_users_json, get_all_users )
+# from App.controllers import ( create_user, get_all_users_json, get_all_users, upload_image)
+from App.controllers import *
 
 # This commands file allow you to create convenient CLI commands for testing controllers
 
@@ -12,10 +15,13 @@ app = create_app()
 migrate = get_migrate(app)
 
 # This command creates and initializes the database
+
+
 @app.cli.command("init", help="Creates and initializes the database")
 def initialize():
     create_db(app)
     print('database intialized')
+
 
 '''
 User Commands
@@ -25,17 +31,22 @@ User Commands
 
 # create a group, it would be the first argument of the comand
 # eg : flask user <command>
-user_cli = AppGroup('user', help='User object commands') 
+user_cli = AppGroup('user', help='User object commands')
 
 # Then define the command and any parameters and annotate it with the group (@)
+
+
 @user_cli.command("create", help="Creates a user")
-@click.argument("username", default="rob")
-@click.argument("password", default="robpass")
+@click.argument("username")
+@click.argument("password")
 def create_user_command(username, password):
-    create_user(username, password)
-    print(f'{username} created!')
+    if create_user(username, password):
+        print(f'Created user `{username}`.')
+    else:
+        print(f'Could not create user. User `{username}` already exists.')
 
 # this command will be : flask user create bob bobpass
+
 
 @user_cli.command("list", help="Lists users in the database")
 @click.argument("format", default="string")
@@ -45,23 +56,38 @@ def list_user_command(format):
     else:
         print(get_all_users_json())
 
-app.cli.add_command(user_cli) # add the group to the cli
+
+app.cli.add_command(user_cli)  # add the group to the cli
+
+
+@user_cli.command("upload", help="Uploads a profile picture")
+@click.argument("username")
+@click.argument("url")
+def upload_command(username, url):
+    user = get_user_by_username(username)
+    if not user:
+        print(f'User `{username}` does not exist.')
+        return
+    upload_image(user.id, url)
 
 
 '''
 Generic Commands
 '''
 
+
 @app.cli.command("init")
 def initialize():
     create_db(app)
     print('database intialized')
 
+
 '''
 Test Commands
 '''
 
-test = AppGroup('test', help='Testing commands') 
+test = AppGroup('test', help='Testing commands')
+
 
 @test.command("user", help="Run User tests")
 @click.argument("type", default="all")
@@ -72,6 +98,6 @@ def user_tests_command(type):
         sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
     else:
         sys.exit(pytest.main(["-k", "App"]))
-    
+
 
 app.cli.add_command(test)
