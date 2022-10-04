@@ -15,6 +15,3 @@ class Profile(db.Model):
     # Relationship Stuff
     pictures = db.relationship("Picture", backref="uploader")
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-
-    # Profile visibility information could possibly be stored in another table?
-    remaining_views = db.Column(db.Integer, nullable=False, default=10)
