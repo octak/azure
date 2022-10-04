@@ -7,6 +7,7 @@ from flask.cli import AppGroup, with_appcontext
 
 # from App.controllers import ( create_user, get_all_users_json, get_all_users, upload_image)
 from App.controllers import *
+from App.models import *
 from App.database import create_db, get_migrate
 from App.main import create_app
 
@@ -80,6 +81,11 @@ def displayUserPics_command(username):
         return
     print(get_all_pictures_json())
 
+@user_cli.command("test", help="Displays all a users profile pictures")
+def test_command():
+    testy = Feed()
+    db.session.add(testy)
+    db.session.commit()
 
 '''
 Generic Commands
