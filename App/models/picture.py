@@ -1,4 +1,6 @@
 from App.database import db
+from App.models import picture_rating
+
 
 class Picture(db.Model):
     # Fields
@@ -11,3 +13,14 @@ class Picture(db.Model):
 
     # Relationship Stuff
     uploader_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
+    raters = db.relationship("User", secondary=picture_rating, backref="picture_id")
+
+    def toJSON(self):
+        return {
+            "id": self.id,
+            "url": self.url,
+            "times-rated": self.times_rated,
+            "total-rating": self.total_rating,
+            "average-rating": self.average_rating,
+            "uploader_id": self.uploader_id
+        }
