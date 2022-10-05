@@ -1,5 +1,4 @@
 from App.database import db
-from App.models import picture_rating
 
 
 class Picture(db.Model):
@@ -12,8 +11,11 @@ class Picture(db.Model):
     average_rating = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationship Stuff
-    uploader_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
-    raters = db.relationship("User", secondary=picture_rating, backref="picture_id")
+    profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
+    ratings = db.relationship("PictureRating", backref="picture")
+
+    def __init__(self, url):
+        self.url = url
 
     def toJSON(self):
         return {
@@ -22,5 +24,10 @@ class Picture(db.Model):
             "times-rated": self.times_rated,
             "total-rating": self.total_rating,
             "average-rating": self.average_rating,
-            "uploader_id": self.uploader_id
+            "uploader_id": self.profile_id
         }
+
+    def increase_rating(self, stars):
+        self.times_rated += 1
+        self.total_rating += stars
+        self.average_rating = self.total_rating / self.times_rated

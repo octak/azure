@@ -5,6 +5,7 @@ from App.models import User
 
 def authenticate(username, password):
     user = User.query.filter_by(username=username).first()
+    print(user)
     if user and user.check_password(password):
         return user
     return None

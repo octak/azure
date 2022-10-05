@@ -1,9 +1,9 @@
 from App.database import db
 
 
-class PictureRating(db.Model):
+class ProfileRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    rated_picture_id = db.Column(db.Integer, db.ForeignKey('picture.id'))
+    rated_profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'))
     rater_profile_id = db.Column(db.Integer)
     value = db.Column(db.Integer)
 
@@ -14,7 +14,7 @@ class PictureRating(db.Model):
     def toJSON(self):
         return {
             "id": self.id,
-            "profile-rated": self.rated_picture_id,
-            "profile-rater": self.rater_picture_id,
+            "profile-rated": self.rated_profile_id,
+            "profile-rater": self.rater_profile_id,
             "value": self.value,
         }

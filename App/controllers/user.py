@@ -1,16 +1,28 @@
 from App.database import db
 import json
-from App.models import Picture, User
+from App.models import Picture, User, Profile
+
+# def create_user(username, password):
+#     temp_user = get_user_by_username(username)
+
+#     if not temp_user:
+#         newuser = User(username=username, password=password)
+#         db.session.add(newuser)
+#         db.session.commit()
+#         return newuser
+#     return None
 
 def create_user(username, password):
-    temp_user = get_user_by_username(username)
+    newuser = User(username=username, password=password)
+    db.session.add(newuser)
+    db.session.commit()
+    return newuser
 
-    if not temp_user:
-        newuser = User(username=username, password=password)
-        db.session.add(newuser)
-        db.session.commit()
-        return newuser
-    return None
+def add_profile_to_user(userID, profileID):
+    user = User.query.filter_by(id=userID).first()
+    profile = Profile.query.filter_by(id=profileID).first()
+    user.profile = profile
+    db.session.commit()
 
 def get_all_users():
     return User.query.all()
