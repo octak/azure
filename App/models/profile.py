@@ -11,7 +11,7 @@ class Profile(db.Model):
     times_rated = db.Column(db.Integer, nullable=False, default=0)
     total_rating = db.Column(db.Integer, nullable=False, default=0)
     average_rating = db.Column(db.Integer, nullable=False, default=0)
-
+    
     # Relationship Stuff
     pictures = db.relationship("Picture", backref="uploader")
     ratings = db.relationship("ProfileRating", backref="profile")
