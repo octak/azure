@@ -13,3 +13,12 @@ class Feed(db.Model):
             "last-refresh": self.last_refresh,
             "current-time": datetime.now()
         }
+
+    def refresh():
+        current_time = datetime().now
+        time_since_last_refresh = current_time - self.last_refresh
+
+        if time_since_last_refresh.days >= 1:
+            self.last_refresh = current_time
+            return True
+        return False
