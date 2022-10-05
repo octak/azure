@@ -1,6 +1,14 @@
 from App.database import db
 
-picture_ratings = db.Table('picture_ratings',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('picture_id', db.Integer, db.ForeignKey('picture.id'))
-)
+
+class PictureRating(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    picture_id = db.Column(db.Integer, db.ForeignKey('picture.id'))
+
+    rating = db.Column(db.Integer)
+
+    def __init__(self, rater, rated, rating):
+        self.user_id_rater = rater
+        self.user_id_rated = rated
+        self.rating = rating
