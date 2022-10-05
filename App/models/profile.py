@@ -17,13 +17,13 @@ class Profile(db.Model):
     ratings = db.relationship("ProfileRating", backref="profile")
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    views_left = db.Column(db.Integer)
+    views_left = db.Column(db.Integer, default=0)
 
 
     def toJSON(self):
         return {
             "id": self.id,
-            "points": self.points,
+            "tier-points": self.tier_points,
             "tier": self.tier,
             "times-rated": self.times_rated,
             "total-rating": self.total_rating,

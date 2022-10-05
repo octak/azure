@@ -2,10 +2,15 @@ from App.models import *
 from App.database import db
 
 def create_profile():
+    feed = Feed.query.first() 
     profile = Profile()
+    profile.views_left = feed.tier_view_dict[str(1)]
     db.session.add(profile)
     db.session.commit()
     return profile
+
+def get_all_profiles():
+    return Profile.query.all()
 
 def get_all_profiles_json():
     profiles = Profile.query.all()
