@@ -24,7 +24,7 @@ class Feed(db.Model):
         }
 
     def refresh(self):
-        current_time = datetime().now
+        current_time = datetime.now()
         time_since_last_refresh = current_time - self.last_refresh
 
         if time_since_last_refresh.days >= 1:

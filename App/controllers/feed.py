@@ -14,15 +14,15 @@ def get_feed():
 def refresh_views():
     feed = Feed.query.first() 
     refresh = feed.refresh()
-    # if refresh:
-    #     profiles = get_all_profiles()
-    #     if profiles:
-    #         for profile in profiles:
-    #             if profile.views_left != None:
-    #                 profile.views_left = feed.tier_view_dict[str(profile.tier)]
-    #                 db.session.add(profile)
-    #         db.session.commit()
-    #     return True
+    if refresh:
+        profiles = get_all_profiles()
+        if profiles:
+            for profile in profiles:
+                if profile.views_left != None:
+                    profile.views_left = feed.tier_view_dict[str(profile.tier)]
+                    db.session.add(profile)
+            db.session.commit()
+        return True
     return False
 
 

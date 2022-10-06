@@ -25,7 +25,7 @@ def initialize():
     print('database intialized')
 
 @app.cli.command("pop", help="Populates the database")
-def populate():
+def pop():
     # feed = create_feed()
     # user1 = create_user(username="bob", password="bobpass")
     # user2 = create_user(username="rob", password="robpass")
@@ -40,10 +40,11 @@ def populate():
     # print(pictures)
     # rating = create_profile_rating(profile1.id, 3)
     # add_rating_to_profile(profile2.id, rating.id)
+    # print(refresh_views())
     # feed = generate_feed()
     # print(feed)
     # print('database populated') 
-    print(refresh_views())
+    
 
 
 
