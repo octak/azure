@@ -2,7 +2,7 @@ from App.models import *
 from App.database import db
 
 def create_profile():
-    feed = Feed.query.first() 
+    feed = get_feed() 
     profile = Profile()
     profile.views_left = feed.tier_view_dict[str(1)]
     db.session.add(profile)
@@ -29,7 +29,7 @@ def add_rating_to_profile(profileID, ratingID):
     rating = ProfileRating.query.filter_by(id=ratingID).first()
     rated_profile = Profile.query.filter_by(id=profileID).first()
     rater_profile = Profile.query.filter_by(id=rating.rater_profile_id).first()
-    feed = Feed.query.first() 
+    feed = get_feed() 
     init_tier = rater_profile.tier
     rated_profile.ratings.append(rating)
     rated_profile.increase_rating(rating.value)
