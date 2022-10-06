@@ -19,7 +19,7 @@ def login_user(user, remember):
 
 
 def logout_user():
-    flask_login.logout_user()
+    flask_login.logout_user() 
 
 def setup_jwt(app):
     return JWT(app, authenticate, identity)
