@@ -24,3 +24,5 @@ class Picture(db.Model):
             "average-rating": self.average_rating,
             "uploader_id": self.uploader_id
         }
+
+    # Pull Request Test
