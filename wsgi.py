@@ -36,13 +36,14 @@ def populate():
     # picture1 = create_picture(url="www")
     # picture2 = create_picture(url="www")
     # add_picture_to_profile(1, 1)
-    pictures = get_all_pictures_json()
-    print(pictures)
+    # pictures = get_all_pictures_json()
+    # print(pictures)
     # rating = create_profile_rating(profile1.id, 3)
     # add_rating_to_profile(profile2.id, rating.id)
     # feed = generate_feed()
     # print(feed)
     # print('database populated') 
+    print(refresh_views())
 
 
 

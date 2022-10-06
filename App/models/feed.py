@@ -22,7 +22,7 @@ class Feed(db.Model):
             "current-time": datetime.now()
         }
 
-    def refresh_views():
+    def refresh(self):
         current_time = datetime().now
         time_since_last_refresh = current_time - self.last_refresh
 
