@@ -1,5 +1,6 @@
-from App.models import *
 from App.database import db
+from App.models import *
+
 
 def create_picture(url):
     picture = Picture(url)

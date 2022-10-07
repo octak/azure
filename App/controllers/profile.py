@@ -1,5 +1,6 @@
-from App.models import *
 from App.database import db
+from App.models import *
+from App.controllers import *
 
 # def add_rating_to_profile(profileID, ratingID):
 #     rating = ProfileRating.query.filter_by(id=ratingID).first()
@@ -30,7 +31,7 @@ from App.database import db
 #     db.session.commit()
 
 def create_profile():
-    feed = get_feed() 
+    feed = Feed.query.first()
     profile = Profile()
     profile.views_left = feed.tier_view_dict[str(1)]
     db.session.add(profile)
@@ -59,12 +60,18 @@ def upload_image(profileID, image_url):
 
     return True
 
+def get_all_profile_pictures(profileID):
+    pictures = Picture.query.filter_by(profile_id=profileID)
+    if not pictures:
+        return None
+    return pictures
+    
 def rate_profile(rater_id, rated_id, rating_value):
     rater_profile = Profile.query.filter_by(id=rater_id).first()
     rated_profile = Profile.query.filter_by(id=rated_id).first()
 
     if not rater_profile or not rated_profile:
-        return
+        return False
 
     rating = ProfileRating.query.filter_by(rater_profile_id=rater_id, rated_profile_id=rated_id).first()
 
@@ -79,12 +86,14 @@ def rate_profile(rater_id, rated_id, rating_value):
     db.session.add(rating)
     db.session.commit()
 
+    return True
+
 def rate_picture(rater_id, rated_id, rating_value):
     rater_profile = Profile.query.filter_by(id=rater_id).first()
     rated_picture = Picture.query.filter_by(id=rated_id).first()
 
     if not rater_profile or not rated_picture:
-        return
+        return False
 
     rating = PictureRating.query.filter_by(rater_profile_id=rater_id, rated_picture_id=rated_id).first()
 
@@ -98,3 +107,5 @@ def rate_picture(rater_id, rated_id, rating_value):
     db.session.add(rated_picture)
     db.session.add(rating)
     db.session.commit()
+
+    return True

@@ -1,5 +1,5 @@
-from App.models import *
 from App.database import db
+from App.models import *
 
 # def get_all_profiles_json():
 #     profiles = Profile.query.all()
@@ -9,7 +9,6 @@ from App.database import db
 #     return profiles
 
 def create_profile_rating(raterID, value):
-    """ Do we need this one? """
     rating = ProfileRating(raterID, value)
     db.session.add(rating)
     db.session.commit()

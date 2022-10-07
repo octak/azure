@@ -5,7 +5,6 @@ import pytest
 from flask import Flask
 from flask.cli import AppGroup, with_appcontext
 
-# from App.controllers import ( create_user, get_all_users_json, get_all_users, upload_image)
 from App.controllers import *
 from App.models import *
 from App.database import create_db, get_migrate
@@ -24,33 +23,57 @@ def initialize():
     create_db(app)
     print('database intialized')
 
-@app.cli.command("pop", help="Populates the database")
-def pop():
-    # feed = create_feed()
-    # user1 = create_user(username="bob", password="bobpass")
-    # user2 = create_user(username="rob", password="robpass")
-    # profile1 = create_profile()
-    # profile2 = create_profile()
-    # add_profile_to_user(user1.id, profile1.id)
-    # add_profile_to_user(user2.id, profile2.id)
-    # picture1 = create_picture(url="www")
-    # picture2 = create_picture(url="www")
-    # add_picture_to_profile(1, 1)
-    # pictures = get_all_pictures_json()
-    # print(pictures)
-    # rating = create_profile_rating(profile1.id, 3)
-    # add_rating_to_profile(profile2.id, rating.id)
-    # print(refresh_views())
-    # feed = generate_feed()
-    # print(feed)
-    # print('database populated') 
-    
+# @app.cli.command("pop", help="Populates the database")
+# def pop():
+#     feed = create_feed()
+#     user1 = create_user(username="bob", password="bobpass")
+#     user2 = create_user(username="rob", password="robpass")
+#     profile1 = create_profile()
+#     profile2 = create_profile()
+#     add_profile_to_user(user1.id, profile1.id)
+#     add_profile_to_user(user2.id, profile2.id)
+#     picture1 = create_picture(url="www")
+#     picture2 = create_picture(url="www")
+#     add_picture_to_profile(1, 1)
+#     pictures = get_all_pictures_json()
+#     print(pictures)
+#     rating = create_profile_rating(profile1.id, 3)
+#     add_rating_to_profile(profile2.id, rating.id)
+#     print(refresh_views())
+#     feed = generate_feed()
+#     print(feed)
+#     print('database populated') 
+
+@app.cli.command("populate", help="Populates the DataBase.")
+def populate():
+    feed = create_feed()
+
+    user1 = create_user(username="simon", password="password_simon")
+    user2 = create_user(username="soren", password="password_soren")
+
+    profile1 = create_profile()
+    profile2 = create_profile()
+
+    link_user_profile(user1.id, profile1.id)
+    link_user_profile(user2.id, profile2.id)
+
+    upload_image(profile1.id, "wikipedia.org/gamma")
+    upload_image(profile1.id, "wikipedia.org/kappa")
+    upload_image(profile1.id, "wikipedia.org/alpha")
+
+    upload_image(profile2.id, "wikipedia.org/dalet")
+
+    pictures = get_all_pictures_json()
+    print(pictures)
+
+    rate_profile(profile1.id, profile2.id, 5)
+    # rate_picture(profile1.id, profile2.id, 5)
+    # print(get_all_profile_pictures(profile1.id))
+
+    print("Done!")
 
 
 
-'''
-User Commands
-'''
 
 # Commands can be organized using groups
 

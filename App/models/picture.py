@@ -14,8 +14,8 @@ class Picture(db.Model):
     profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
     ratings = db.relationship("PictureRating", backref="picture")
 
-    def __init__(self, url):
-        self.url = url
+    # def __init__(self, url):
+    #     self.url = url
 
     def toJSON(self):
         return {

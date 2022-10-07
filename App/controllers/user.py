@@ -1,6 +1,7 @@
-from App.database import db
 import json
-from App.models import Picture, User, Profile
+
+from App.database import db
+from App.models import Picture, Profile, User
 
 # def create_user(username, password):
 #     temp_user = get_user_by_username(username)

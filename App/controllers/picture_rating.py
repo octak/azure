@@ -1,8 +1,7 @@
-from App.models import *
 from App.database import db
+from App.models import *
 
 def create_picture_rating(rater, value):
-    """ Do we need this one? """
     rating = PictureRating(rater, value)
     db.session.add(rating)
     db.session.commit()
