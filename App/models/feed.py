@@ -16,7 +16,6 @@ class Feed(db.Model):
         "5": 10
     }
 
-
     def toJSON(self):
         return {
             "last-refresh": self.last_refresh,

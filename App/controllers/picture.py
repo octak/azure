@@ -7,23 +7,16 @@ def create_picture(url):
     db.session.commit()
     return picture
 
+def get_picture_by_id(pictureID):
+    return Picture.query.get(pictureID)
+
+def get_all_pictures():
+    return Picture.query.all()
+
 def get_all_pictures_json():
-    pictures = Picture.query.all()
+    pictures = get_all_pictures()
     if not pictures:
         return []
     pictures.sort(key=lambda picture: picture.average_rating, reverse=True)
     pictures = [picture.toJSON() for picture in pictures]
     return pictures
-
-def add_rating_to_picture(pictureID, ratingID):
-    picture = Picture.query.filter_by(id=pictureID).first()
-    rating = PictureRating.query.filter_by(id=ratingID).first()
-    picture.ratings.append(rating)
-    db.session.commit()
-
-def add_rating_to_profile(pictureID, ratingID):
-    rating = PictureRating.query.filter_by(id=ratingID).first()
-    rated_picture = Picture.query.filter_by(id=pictureID).first()
-    rated_profile.ratings.append(rating)
-    rated_profile.increase_rating(rating.value)
-    db.session.commit()

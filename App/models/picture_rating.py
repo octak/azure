@@ -4,7 +4,7 @@ from App.database import db
 class PictureRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rated_picture_id = db.Column(db.Integer, db.ForeignKey('picture.id'))
-    rater_profile_id = db.Column(db.Integer)
+    rater_profile_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     value = db.Column(db.Integer)
 
     def __init__(self, rater, value):

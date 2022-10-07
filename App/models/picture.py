@@ -27,7 +27,11 @@ class Picture(db.Model):
             "uploader_id": self.profile_id
         }
 
-    def increase_rating(self, stars):
+    def receive_rating(self, stars):
         self.times_rated += 1
         self.total_rating += stars
+        self.average_rating = self.total_rating / self.times_rated
+
+    def update_rating(self, stars):
+        self.total_rating -= stars
         self.average_rating = self.total_rating / self.times_rated
