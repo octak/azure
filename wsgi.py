@@ -67,12 +67,8 @@ def populate():
     print(pictures)
 
     rate_profile(profile1.id, profile2.id, 5)
-    # rate_picture(profile1.id, profile2.id, 5)
-    # print(get_all_profile_pictures(profile1.id))
 
     print("Done!")
-
-
 
 
 # Commands can be organized using groups

@@ -82,6 +82,14 @@ def rate_profile(rater_id, rated_id, rating_value):
         rating = ProfileRating(rated_profile_id=rated_id, rater_profile_id=rater_id, value=rating_value)
         rated_profile.receive_rating(rating_value)
 
+        old_tier = rater_profile.tier
+        rater_profile.increase_tier_points()
+        new_tier = rater_profile.tier
+
+        feed = Feed.query.first()
+        if old_tier != new_tier:
+            rater_profile.views_left = feed.tier_view_dict[str(new_tier)]
+
     db.session.add(rated_profile)
     db.session.add(rating)
     db.session.commit()
