@@ -149,7 +149,8 @@ def initialiseDB():
 
     user_azure = User(username="azure", password="no-exceptions")
     user_cerulean = User(username="cerulean", password="shayakh-li")
-    db.session.add([user_azure, user_cerulean])
+    db.session.add(user_azure)
+    db.session.add(user_cerulean)
     db.session.commit()
 
     profile_azure = new_profile(user_azure)
@@ -163,7 +164,8 @@ def initialiseDB():
     print(get_all_pictures())
 
     rating = ProfileRating(rater=profile_azure, ratee=profile_cerulean, value=3)
-    db.session.add([user_azure, user_cerulean])
+    db.session.add(user_azure)
+    db.session.add(user_cerulean)
     db.session.commit()
     
     print(refresh_views())

@@ -12,7 +12,7 @@ class Picture(db.Model):
 
     """ NEW RELATIONSHIPS """
     profile = db.relationship("Profile", back_populates="pictures")
-    ratings = db.relationship("PictureRating", back_populates="picture")
+    ratings = db.relationship("PictureRating", back_populates="ratee")
 
     def toJSON(self):
         return {

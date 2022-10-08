@@ -11,6 +11,9 @@ def create_feed():
 def get_feed():
     return Feed.query.first() 
 
+def get_all_profiles():
+    return Profile.query.all()
+
 def refresh_views():
     feed = Feed.query.first() 
     refresh = feed.refresh()

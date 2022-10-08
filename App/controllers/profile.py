@@ -78,8 +78,7 @@ def create_profile():
     db.session.commit()
     return profile
 
-def get_all_profiles():
-    return Profile.query.all()
+
 
 def get_all_profiles_json():
     profiles = Profile.query.all()
