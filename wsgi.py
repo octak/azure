@@ -160,8 +160,13 @@ def initialiseDB():
     profile_cerulean.pictures.append(Picture(url="wikipedia.org/cerulean", profile=profile_cerulean))
     db.session.commit()
 
+    add_picture_to_profile(profile_azure.id, "ru.m.wikipedia.org/izumrud")
+
     print("All Pictures:")
     print(get_all_pictures())
+
+    print("Azure's Pictures:")
+    print(profile_azure.pictures)
 
     rating = ProfileRating(rater=profile_azure, ratee=profile_cerulean, value=3)
     db.session.add(user_azure)

@@ -78,8 +78,6 @@ def create_profile():
     db.session.commit()
     return profile
 
-
-
 def get_all_profiles_json():
     profiles = Profile.query.all()
     return [profile.toJSON() for profile in profiles] if profiles else []
@@ -88,10 +86,10 @@ def get_profile_by_id(profileID):
     return Profile.query.get(profileID)
 
 def add_picture_to_profile(profileID, image_url):
-    profile_temp = Profile.query.get(profileID)
-    if not profile_temp:
+    profile_ = Profile.query.get(profileID)
+    if not profile_:
         return False
-    picture = Picture(url=image_url, profile=profile_temp)
+    picture = Picture(url=image_url, profile=profile_)
     db.session.add(picture)
     db.session.commit()
     return True
@@ -115,10 +113,9 @@ def rate_profile(rater_id, ratee_id, value_):
         old_tier = rater_.tier
         rater_.increase_tier_points()
         new_tier = rater_.tier
-
         feed = Feed.query.first()
         if old_tier != new_tier:
-            rater_.views_left = feed.tier_view_dict[str(new_tier)]    
+            rater_.views_left = feed.tier_view_dict[str(new_tier)]
     db.session.add([rater_, ratee_, rating])
     db.session.commit()
     return True
@@ -128,6 +125,7 @@ def rate_picture(rater_id, ratee_id, value_):
     ratee_ = Picture.query.get(ratee_id)
     if not rater_ or not ratee_:
         return False
+    rating = PictureRating.query.get((rater_id, ratee_id))
     if rating:
         ratee_.update_rating(rating.value - value_)
         rating.value = value_

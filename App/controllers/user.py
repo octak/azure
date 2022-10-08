@@ -2,23 +2,6 @@ import json
 from App.database import db
 from App.models import Picture, Profile, User
 
-# def create_user(username, password):
-#     temp_user = get_user_by_username(username)
-
-#     if not temp_user:
-#         newuser = User(username=username, password=password)
-#         db.session.add(newuser)
-#         db.session.commit()
-#         return newuser
-#     return None
-
-# def get_all_users_json():
-#     users = User.query.all()
-#     if not users:
-#         return []
-#     users = [user.toJSON() for user in users]
-#     return users
-
 def create_user(username, password):
     newuser = User(username=username, password=password)
     db.session.add(newuser)
@@ -31,14 +14,14 @@ def new_profile(user_):
     db.session.commit()
     return user_.profile
     
-def add_profile_to_user(userID, profileID):
-    user = User.query.get(userID)
-    profile = Profile.query.get(profileID)
-    if not user or not profile:
-        return False
-    user.profile = profile
-    db.session.commit()
-    return True
+# def add_profile_to_user(userID, profileID):
+#     user = User.query.get(userID)
+#     profile = Profile.query.get(profileID)
+#     if not user or not profile:
+#         return False
+#     user.profile = profile
+#     db.session.commit()
+#     return True
 
 def get_all_users():
     return User.query.all()
@@ -61,3 +44,8 @@ def update_username(userID, username):
     db.session.add(user)
     db.session.commit()
     return True
+
+# def update_username(user, username):
+#     user.username = username
+#     db.session.add(user)
+#     db.session.commit()
