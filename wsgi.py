@@ -6,22 +6,20 @@ from flask import Flask
 from flask.cli import AppGroup, with_appcontext
 
 from App.controllers import *
-from App.models import *
 from App.database import create_db, get_migrate
 from App.main import create_app
+from App.models import *
 
-# This commands file allow you to create convenient CLI commands for testing controllers
+# This commands file allows you to create convenient CLI commands for testing controllers
 
 app = create_app()
 migrate = get_migrate(app)
 
-# This command creates and initializes the database
-
-
 @app.cli.command("init", help="Creates and initializes the database")
 def initialize():
+    """This command creates and initializes the database."""
     create_db(app)
-    print('database intialized')
+    print("Database initialsied.")
 
 # @app.cli.command("pop", help="Populates the database")
 # def pop():
@@ -44,31 +42,23 @@ def initialize():
 #     print(feed)
 #     print('database populated') 
 
-@app.cli.command("populate", help="Populates the DataBase.")
-def populate():
-    feed = create_feed()
-
-    user1 = create_user(username="simon", password="password_simon")
-    user2 = create_user(username="soren", password="password_soren")
-
-    profile1 = create_profile()
-    profile2 = create_profile()
-
-    link_user_profile(user1.id, profile1.id)
-    link_user_profile(user2.id, profile2.id)
-
-    upload_image(profile1.id, "wikipedia.org/gamma")
-    upload_image(profile1.id, "wikipedia.org/kappa")
-    upload_image(profile1.id, "wikipedia.org/alpha")
-
-    upload_image(profile2.id, "wikipedia.org/dalet")
-
-    pictures = get_all_pictures_json()
-    print(pictures)
-
-    rate_profile(profile1.id, profile2.id, 5)
-
-    print("Done!")
+# @app.cli.command("populate", help="Populates the DataBase.")
+# def populate():
+#     feed = create_feed()
+#     user1 = create_user(username="simon", password="password_simon")
+#     user2 = create_user(username="soren", password="password_soren")
+#     profile1 = create_profile()
+#     profile2 = create_profile()
+#     link_user_profile(user1.id, profile1.id)
+#     link_user_profile(user2.id, profile2.id)
+#     upload_image(profile1.id, "wikipedia.org/gamma")
+#     upload_image(profile1.id, "wikipedia.org/kappa")
+#     upload_image(profile1.id, "wikipedia.org/alpha")
+#     upload_image(profile2.id, "wikipedia.org/dalet")
+#     pictures = get_all_pictures_json()
+#     print(pictures)
+#     rate_profile(profile1.id, profile2.id, 5)
+#     print("Done!")
 
 
 # Commands can be organized using groups
@@ -140,10 +130,6 @@ def initialize():
     print('database intialized')
 
 
-'''
-Test Commands
-'''
-
 test = AppGroup('test', help='Testing commands')
 
 
@@ -157,5 +143,32 @@ def user_tests_command(type):
     else:
         sys.exit(pytest.main(["-k", "App"]))
 
+@test.command("initialiseDB", help="Attempts to create and set up the database.")
+def initialiseDB():
+    feed = create_feed()
+
+    user_azure = User(username="azure", password="no-exceptions")
+    user_cerulean = User(username="cerulean", password="shayakh-li")
+    db.session.add([user_azure, user_cerulean])
+    db.session.commit()
+
+    profile_azure = new_profile(user_azure)
+    profile_cerulean = new_profile(user_cerulean)
+
+    profile_azure.pictures.append(Picture(url="wikipedia.org/azure"))
+    profile_cerulean.pictures.append(Picture(url="wikipedia.org/cerulean", profile=profile_cerulean))
+    db.session.commit()
+
+    print("All Pictures:")
+    print(get_all_pictures())
+
+    rating = ProfileRating(rater=profile_azure, ratee=profile_cerulean, value=3)
+    db.session.add([user_azure, user_cerulean])
+    db.session.commit()
+    
+    print(refresh_views())
+    print(generate_feed())
+
+    print("Database initialised.") 
 
 app.cli.add_command(test)

@@ -1,7 +1,6 @@
 from App.database import db
 from App.models import *
 
-
 def create_picture(url):
     picture = Picture(url)
     db.session.add(picture)

@@ -1,5 +1,4 @@
 import json
-
 from App.database import db
 from App.models import Picture, Profile, User
 
@@ -26,16 +25,19 @@ def create_user(username, password):
     db.session.commit()
     return newuser
 
-def link_user_profile(userID, profileID):
+def new_profile(user_):
+    profile = Profile(user=user_)
+    db.session.add(profile)
+    db.session.commit()
+    return user_.profile
+    
+def add_profile_to_user(userID, profileID):
     user = User.query.get(userID)
     profile = Profile.query.get(profileID)
-
     if not user or not profile:
         return False
-
     user.profile = profile
     db.session.commit()
-
     return True
 
 def get_all_users():
@@ -52,15 +54,10 @@ def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
 
 def update_username(userID, username):
-    user = get_user_by_id(userID)
-
+    user = User.query.get(userID)
     if not user:
         return False
-
     user.username = username
     db.session.add(user)
     db.session.commit()
-    
     return True
-
-
