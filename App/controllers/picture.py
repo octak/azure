@@ -18,5 +18,4 @@ def get_all_pictures_json():
     if not pictures:
         return []
     pictures.sort(key=lambda picture: picture.average_rating, reverse=True)
-    pictures = [picture.toJSON() for picture in pictures]
-    return pictures
+    return [picture.toJSON() for picture in pictures]

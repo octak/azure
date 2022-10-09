@@ -1,4 +1,5 @@
 from App.database import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 class Profile(db.Model):
     views_per_tier = {
@@ -24,20 +25,27 @@ class Profile(db.Model):
     """ NEW RELATIONSHIPS """
     user = db.relationship("User", back_populates="profile")
     pictures = db.relationship("Picture", back_populates="profile")
-    rated_pictures = db.relationship("PictureRating", back_populates="rater")
-    rated_profiles = db.relationship("ProfileRating", foreign_keys="ProfileRating.rater_id", back_populates="rater")
-    ratings = db.relationship("ProfileRating", foreign_keys="ProfileRating.ratee_id", back_populates="ratee")
+    
+    rated_picture_assoc = db.relationship("PictureRating", back_populates="rater")
+    rated_pictures = association_proxy("rated_picture_assoc", "ratee")
+    
+    rated_profile_assoc = db.relationship("ProfileRating", foreign_keys="ProfileRating.rater_id", back_populates="rater")
+    rated_profiles = association_proxy("rated_profile_assoc", "ratee")
+
+    rating_assoc = db.relationship("ProfileRating", foreign_keys="ProfileRating.ratee_id", back_populates="ratee")
+    ratings = association_proxy("rating_assoc", "rater")
 
     def toJSON(self):
         return {
             "id": self.id,
+            "username": self.user.username,
             "user-id": self.user_id,
             "tier": self.tier,
             "tier-points": self.tier_points,
             "times-rated": self.times_rated,
             "total-rating": self.total_rating,
             "average-rating": self.average_rating,
-            "pictures": self.pictures,
+            "pictures": [picture.toJSON() for picture in self.pictures],
             "views-left": self.views_left
         }
 

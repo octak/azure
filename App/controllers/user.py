@@ -29,7 +29,7 @@ def get_all_users():
 
 def get_all_users_json():
     users = User.query.all()
-    return [user.toJSON() for user in users] if users else [] 
+    return [user.toJSON() for user in users] if users else []
 
 def get_user_by_id(userID):
     return User.query.get(userID)

@@ -91,6 +91,10 @@ def get_all_profiles_json():
 def get_profile_by_id(profileID):
     return Profile.query.get(profileID)
 
+def get_profile_by_username(username):
+    user = User.query.filter_by(username=username).first()
+    return Profile.query.filter_by(user_id=user.id).first() if user else None
+
 def add_picture_to_profile(profileID, image_url):
     profile_ = Profile.query.get(profileID)
     if not profile_:
@@ -100,9 +104,32 @@ def add_picture_to_profile(profileID, image_url):
     db.session.commit()
     return True
 
-def get_all_pictures_from_profile(profileID):
-    pictures = Profile.query.get(profileID).pictures
-    return pictures if pictures else []
+def get_all_pictures_from_profile(username):
+    profile = get_profile_by_username(username)
+    if not profile:
+        return []
+    pictures = profile.pictures
+    pictures.sort(key=lambda picture: picture.average_rating, reverse=True)
+    return [picture.toJSON() for picture in pictures]
+
+def get_rated_profiles(username):
+    profile = get_profile_by_username(username)
+    if not profile:
+        return []
+    return [profile_.toJSON() for profile_ in profile.rated_profiles]
+
+def get_rated_pictures(username):
+    profile = get_profile_by_username(username)
+    if not profile:
+        return []
+    return [picture.toJSON() for picture in profile.rated_pictures]
+
+def get_profile_raters(username):
+    profile = get_profile_by_username(username)
+    if not profile:
+        return []
+    return [profile_.toJSON() for profile_ in profile.ratings]
+
 
 def rate_profile(rater_id, ratee_id, value_):
     rater_ = Profile.query.get(rater_id)
@@ -117,12 +144,6 @@ def rate_profile(rater_id, ratee_id, value_):
         rating = ProfileRating(rater=rater_, ratee=ratee_, value=value_)
         ratee_.receive_rating(value_)
         rater_.increase_tier_points()
-        # old_tier = rater_.tier
-        # rater_.increase_tier_points()
-        # new_tier = rater_.tier
-        # feed = Feed.query.first()
-        # if old_tier != new_tier:
-        #     rater_.views_left = feed.tier_view_dict[str(new_tier)]
     db.session.add_all([rater_, ratee_, rating])
     db.session.commit()
     return True

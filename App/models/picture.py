@@ -1,4 +1,5 @@
 from App.database import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 class Picture(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,7 +13,9 @@ class Picture(db.Model):
 
     """ NEW RELATIONSHIPS """
     profile = db.relationship("Profile", back_populates="pictures")
-    ratings = db.relationship("PictureRating", back_populates="ratee")
+
+    rating_assoc = db.relationship("PictureRating", back_populates="ratee")
+    ratings = association_proxy("rating_assoc", "rater")
 
     def toJSON(self):
         return {
