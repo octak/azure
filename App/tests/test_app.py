@@ -1,4 +1,5 @@
-import os, tempfile, pytest, logging, unittest
+'''
+immport os, tempfile, pytest, logging, unittest
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from App.main import create_app
@@ -68,3 +69,5 @@ class UsersIntegrationTests(unittest.TestCase):
         update_user(1, "ronnie")
         user = get_user(1)
         assert user.username == "ronnie"
+
+'''
