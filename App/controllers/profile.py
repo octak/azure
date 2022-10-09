@@ -70,13 +70,19 @@ from App.controllers import *
 #     db.session.commit()
 #     return True
 
-def create_profile():
-    feed = Feed.query.first()
-    profile = Profile()
-    profile.views_left = feed.tier_view_dict[str(1)]
-    db.session.add(profile)
-    db.session.commit()
-    return profile
+# def create_profile():
+#     feed = Feed.query.first()
+#     profile = Profile()
+#     profile.views_left = feed.tier_view_dict[str(1)]
+#     db.session.add(profile)
+#     db.session.commit()
+#     return profile
+
+# def create_profile(user_):
+#     profile = Profile(user=user_)
+#     db.session.add(profile)
+#     db.session.commit()
+#     return profile
 
 def get_all_profiles_json():
     profiles = Profile.query.all()
@@ -110,13 +116,14 @@ def rate_profile(rater_id, ratee_id, value_):
     else:
         rating = ProfileRating(rater=rater_, ratee=ratee_, value=value_)
         ratee_.receive_rating(value_)
-        old_tier = rater_.tier
         rater_.increase_tier_points()
-        new_tier = rater_.tier
-        feed = Feed.query.first()
-        if old_tier != new_tier:
-            rater_.views_left = feed.tier_view_dict[str(new_tier)]
-    db.session.add([rater_, ratee_, rating])
+        # old_tier = rater_.tier
+        # rater_.increase_tier_points()
+        # new_tier = rater_.tier
+        # feed = Feed.query.first()
+        # if old_tier != new_tier:
+        #     rater_.views_left = feed.tier_view_dict[str(new_tier)]
+    db.session.add_all([rater_, ratee_, rating])
     db.session.commit()
     return True
 
@@ -132,6 +139,6 @@ def rate_picture(rater_id, ratee_id, value_):
     else:
         rating = PictureRating(rater=rater_, ratee=ratee_, value=value_)
         ratee_.receive_rating(value_)
-    db.session.add([rater_, ratee_, rating])
+    db.session.add_all([rater_, ratee_, rating])
     db.session.commit()
     return True

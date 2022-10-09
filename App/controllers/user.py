@@ -9,9 +9,10 @@ def create_user(username, password):
     return newuser
 
 def new_profile(user_):
-    profile = Profile(user=user_)
-    db.session.add(profile)
-    db.session.commit()
+    if not user_.profile:
+        user_.profile = Profile()
+        db.session.add(user_)
+        db.session.commit()
     return user_.profile
     
 # def add_profile_to_user(userID, profileID):
@@ -36,16 +37,16 @@ def get_user_by_id(userID):
 def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
 
-def update_username(userID, username):
-    user = User.query.get(userID)
-    if not user:
-        return False
-    user.username = username
-    db.session.add(user)
-    db.session.commit()
-    return True
-
-# def update_username(user, username):
+# def update_username(userID, username):
+#     user = User.query.get(userID)
+#     if not user:
+#         return False
 #     user.username = username
 #     db.session.add(user)
 #     db.session.commit()
+#     return True
+
+def update_username(user, username):
+    user.username = username
+    db.session.add(user)
+    db.session.commit()

@@ -1,6 +1,14 @@
 from App.database import db
 
 class Profile(db.Model):
+    views_per_tier = {
+        1: 2,
+        2: 4,
+        3: 6,
+        4: 8,
+        5: 10
+    }
+    
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     
@@ -11,7 +19,7 @@ class Profile(db.Model):
     total_rating = db.Column(db.Integer, nullable=False, default=0)
     average_rating = db.Column(db.Integer, nullable=False, default=0)
     
-    views_left = db.Column(db.Integer, default=0)
+    views_left = db.Column(db.Integer, default=views_per_tier[1])
 
     """ NEW RELATIONSHIPS """
     user = db.relationship("User", back_populates="profile")
@@ -43,14 +51,22 @@ class Profile(db.Model):
         self.average_rating = self.total_rating / self.times_rated
 
     def increase_tier_points(self):
-        self.tier_points += 1
+        if (self.tier_points < 10):
+            self.tier_points += 1
+            self.update_tier()
 
     def update_tier(self):
-        if self.tier_points <= 4:
+        if self.tier_points == 4:
             self.tier = 2
-        elif self.tier_points <= 6:
+        elif self.tier_points == 6:
             self.tier = 3
-        elif self.tier_points <= 8:
+        elif self.tier_points == 8:
             self.tier = 4
-        elif self.tier_points <= 10:
+        elif self.tier_points == 10:
             self.tier = 5
+        else:
+            return
+        self.reset_views_left()
+
+    def reset_views_left():
+        self.views_left = self.views_per_tier[self.tier]
