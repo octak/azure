@@ -6,3 +6,6 @@ def create_picture_rating(rater, value):
     db.session.add(rating)
     db.session.commit()
     return rating
+
+def get_all_picture_ratings():
+    return PictureRating.query.all()

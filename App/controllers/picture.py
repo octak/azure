@@ -1,7 +1,6 @@
 from App.database import db
 from App.models import *
 
-
 def create_picture(url):
     picture = Picture(url)
     db.session.add(picture)
@@ -19,5 +18,4 @@ def get_all_pictures_json():
     if not pictures:
         return []
     pictures.sort(key=lambda picture: picture.average_rating, reverse=True)
-    pictures = [picture.toJSON() for picture in pictures]
-    return pictures
+    return [picture.toJSON() for picture in pictures]

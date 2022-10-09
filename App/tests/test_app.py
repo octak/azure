@@ -1,26 +1,21 @@
-import os, tempfile, pytest, logging, unittest
+'''
+immport os, tempfile, pytest, logging, unittest
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from App.main import create_app
 from App.database import create_db
 from App.models import User
-from App.controllers import (
-    create_user,
-    get_all_users_json,
-    authenticate,
-    get_user,
-    get_user_by_username,
-    update_user
-)
+from App.controllers import *
 
 from wsgi import app
 
 
 LOGGER = logging.getLogger(__name__)
 
-'''
-   Unit Tests
-'''
+"""
+Unit Tests
+"""
+
 class UserUnitTests(unittest.TestCase):
 
     def test_new_user(self):
@@ -43,9 +38,9 @@ class UserUnitTests(unittest.TestCase):
         user = User("bob", password)
         assert user.check_password(password)
 
-'''
+"""
     Integration Tests
-'''
+"""
 
 # This fixture creates an empty database for the test and deletes it after the test
 # scope="class" would execute the fixture once and resued for all methods in the class
@@ -75,3 +70,4 @@ class UsersIntegrationTests(unittest.TestCase):
         update_user(1, "ronnie")
         user = get_user(1)
         assert user.username == "ronnie"
+'''

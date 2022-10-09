@@ -1,7 +1,6 @@
-from App.controllers import profile
+from App.controllers import *
 from App.database import db
 from App.models import *
-
 
 def create_feed():
     feed = Feed()
@@ -12,20 +11,35 @@ def create_feed():
 def get_feed():
     return Feed.query.first() 
 
+def get_all_profiles():
+    return Profile.query.all()
+
+# def refresh_views():
+#     feed = Feed.query.first() 
+#     refresh = feed.refresh()
+#     if refresh:
+#         profiles = get_all_profiles()
+#         if profiles:
+#             for profile in profiles:
+#                 if profile.views_left != None:
+#                     profile.views_left = feed.tier_view_dict[str(profile.tier)]
+#                     db.session.add(profile)
+#             db.session.commit()
+#         return True
+#     return False
+
 def refresh_views():
-    feed = Feed.query.first() 
-    refresh = feed.refresh()
-    if refresh:
+    feed = Feed.query.first()
+    if feed.refresh():
         profiles = get_all_profiles()
         if profiles:
             for profile in profiles:
-                if profile.views_left != None:
-                    profile.views_left = feed.tier_view_dict[str(profile.tier)]
-                    db.session.add(profile)
-            db.session.commit()
+                profile.reset_views_left()
+                db.session.add(profile)
+        db.session.add(feed)
+        db.session.commit()
         return True
     return False
-
 
 def generate_feed():
     profiles = get_all_profiles()
@@ -38,4 +52,4 @@ def generate_feed():
                 db.session.add(profile)
         db.session.commit()
     return listing
-            
+    

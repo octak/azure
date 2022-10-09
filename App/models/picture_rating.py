@@ -1,20 +1,17 @@
 from App.database import db
-
+from sqlalchemy.ext.associationproxy import association_proxy
 
 class PictureRating(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    rated_picture_id = db.Column(db.Integer, db.ForeignKey('picture.id'))
-    rater_profile_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    rater_id = db.Column(db.Integer, db.ForeignKey("profile.id"), primary_key=True)
+    ratee_id = db.Column(db.Integer, db.ForeignKey("picture.id"), primary_key=True)
     value = db.Column(db.Integer)
-
-    def __init__(self, rater, value):
-        self.rater_profile_id = rater
-        self.value = value
-
+    
+    rater = db.relationship("Profile", back_populates="rated_picture_assoc")
+    ratee = db.relationship("Picture", back_populates="rating_assoc")
+    
     def toJSON(self):
         return {
-            "id": self.id,
-            "profile-rated": self.rated_picture_id,
-            "profile-rater": self.rater_picture_id,
+            "rated-picture": self.ratee_id,
+            "rated-by": self.rater_id,
             "value": self.value,
         }
