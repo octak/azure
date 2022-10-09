@@ -93,7 +93,7 @@ def get_profile_by_id(profileID):
 
 def get_profile_by_username(username):
     user = User.query.filter_by(username=username).first()
-    return Profile.query.filter_by(user_id=user.id).first() if user else None
+    return user.profile if user else None
 
 def add_picture_to_profile(profileID, image_url):
     profile_ = Profile.query.get(profileID)
