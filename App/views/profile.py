@@ -1,8 +1,6 @@
 import json
-from flask_jwt import jwt_required
-# from App.controllers import profile as profile_controller
 from App.controllers import *
-# from App.controllers import auth, feed, picture_rating, picture, profile_rating
+from flask_jwt import jwt_required
 from flask import Blueprint, jsonify, redirect, render_template, request, send_from_directory
 
 profile_views = Blueprint('profile_views', __name__,template_folder='../templates')
@@ -29,7 +27,8 @@ def create_new_profile():
 @profile_views.route('/profiles', methods=['GET'])
 def get_all_profiless():
     profiles = get_all_profiles()
-    return jsonify({'profiles': jsonify_(profiles)})
+    # return jsonify({'profiles': jsonify_(profiles)})
+    return jsonify([profile.toJSON() for profile in profile])
 
 
 @profile_views.route('/profiles/<username>', methods=['GET'])
