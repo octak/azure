@@ -4,16 +4,13 @@ from sqlalchemy.ext.associationproxy import association_proxy
 class Picture(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
-
     url = db.Column(db.String, nullable=False)
-
     times_rated = db.Column(db.Integer, nullable=False, default=0)
     total_rating = db.Column(db.Integer, nullable=False, default=0)
     average_rating = db.Column(db.Integer, nullable=False, default=0)
 
     """ NEW RELATIONSHIPS """
     profile = db.relationship("Profile", back_populates="pictures")
-
     rating_assoc = db.relationship("PictureRating", back_populates="ratee")
     ratings = association_proxy("rating_assoc", "rater")
 

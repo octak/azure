@@ -1,5 +1,5 @@
 from App.database import db
-from sqlalchemy.ext.associationproxy import association_proxy
+
 
 class PictureRating(db.Model):
     rater_id = db.Column(db.Integer, db.ForeignKey("profile.id"), primary_key=True)

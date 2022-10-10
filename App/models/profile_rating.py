@@ -1,5 +1,4 @@
 from App.database import db
-from sqlalchemy.ext.associationproxy import association_proxy
 
 
 class ProfileRating(db.Model):
@@ -16,4 +15,3 @@ class ProfileRating(db.Model):
             "rated-by": self.rater_id,
             "value": self.value,
         }
-        
