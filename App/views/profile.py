@@ -22,7 +22,7 @@ def get_all_profiles():
 @profile_views.route("/profiles/<username>", methods=["GET"])
 def get_profile(username):
     profile = profile_controller.get_profile(username)
-    return jsonify(profile.toJSON()) if profile else jsonify([])
+    return jsonify(profile.toJSON()) if profile else jsonify({'message': 'Profile does not exist.'})
 
 
 @profile_views.route("/profiles/<username>/pictures", methods=["GET"])
