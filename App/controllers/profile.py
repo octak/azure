@@ -1,13 +1,11 @@
-import json
 from functools import singledispatch
 
-from App.controllers import *
 from App.database import db
-from App.models import *
+from App.models import Picture, PictureRating, Profile, ProfileRating
 
 
 def create_profile(username, password):
-    '''Attempts to create a new profile. Returns None if username is in use.'''
+    """Attempts to create a new profile. Returns None if username is in use."""
     if Profile.query.filter_by(username=username).first():
         return None
     new_profile = Profile(username=username, password=password)
@@ -16,35 +14,30 @@ def create_profile(username, password):
     return new_profile
 
 
-def jsonify_(items):
-    '''Returns JSON representation of supplied objects.'''
-    return [item.toJSON() for item in items] if items else []
-
-
 def get_all_profiles():
-    '''Returns a list of all profiles. '''
+    """Returns a list of all profiles."""
     return Profile.query.all()
+
 
 @singledispatch
 def get_profile(key):
     raise NotImplementedError
 
+
 @get_profile.register
 def _(key: int):
-    '''Returns profile represented by the supplied ID. '''
+    """Returns profile represented by the supplied ID."""
     return Profile.query.get(key)
 
 
 @get_profile.register
 def _(key: str):
-    '''Returns profile represented by the supplied username.'''
+    """Returns profile represented by the supplied username."""
     return Profile.query.filter_by(username=key).first()
 
 
-
-
 def update_username(key, username):
-    '''Attempts to update a username. Returns False if profile does not exist or username is in use.'''
+    """Attempts to update a username. Returns False if profile does not exist or username is in use."""
     profile = get_profile(key)
     if profile and not get_profile(username):
         profile.username = username
@@ -55,7 +48,7 @@ def update_username(key, username):
 
 
 def upload_picture(key, url):
-    '''Adds a picture to a profile. Returns False if profile does not exist.'''
+    """Adds a picture to a profile. Returns False if profile does not exist."""
     profile = get_profile(key)
     if not profile:
         return False
@@ -66,31 +59,31 @@ def upload_picture(key, url):
 
 
 def sort_pictures(pictures):
-    '''Sorts pictures in order of highest to lowest rating.'''
+    """Sorts pictures in order of highest to lowest rating."""
     pictures.sort(key=lambda picture: picture.average_rating, reverse=True)
     return pictures
 
 
-def get_all_pictures(key):
-    '''Returns all pictures uploaded by the specified profile.'''
+def get_uploaded_pictures(key):
+    """Returns all pictures uploaded by the specified profile."""
     profile = get_profile(key)
     return profile.pictures if profile else []
 
 
 def get_rated_profiles(key):
-    '''Returns all pictures rated by the specified profile.'''
+    """Returns all profiles rated by the specified profile."""
     profile = get_profile(key)
     return profile.rated_profiles if profile else []
 
 
 def get_rated_pictures(key):
-    '''Returns all profiles rated by the specified profile.'''
+    """Returns all pictures rated by the specified profile."""
     profile = get_profile(key)
-    return profile.rated_profiles if profile else []
+    return profile.rated_pictures if profile else []
 
 
 def get_raters(key):
-    '''Returns all profiles which rated the specified profile.'''
+    """Returns all profiles which rated the specified profile."""
     profile = get_profile(key)
     return profile.ratings if profile else []
 

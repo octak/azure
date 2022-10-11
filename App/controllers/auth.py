@@ -13,7 +13,7 @@ def authenticate(username, password):
 
 def identity(payload):
     # Payload is a dictionary which is passed to the function by Flask JWT
-    return Profile.query.get(payload['identity'])
+    return Profile.query.get(payload["identity"])
 
 
 def login_user(user, remember):

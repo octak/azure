@@ -4,14 +4,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 
 class Profile(db.Model):
-    views_per_tier = {
-        1: 2,
-        2: 4,
-        3: 6,
-        4: 8,
-        5: 10
-    }
-    
+    views_per_tier = {1: 2, 2: 4, 3: 6, 4: 8, 5: 10}
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
@@ -36,7 +30,7 @@ class Profile(db.Model):
         self.set_password(password)
 
     def set_password(self, password):
-        self.password = generate_password_hash(password, method='sha256')
+        self.password = generate_password_hash(password, method="sha256")
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -52,7 +46,7 @@ class Profile(db.Model):
             "total-rating": self.total_rating,
             "average-rating": self.average_rating,
             "pictures": [picture.toJSON() for picture in self.pictures],
-            "views-left": self.views_left
+            "views-left": self.views_left,
         }
 
     def receive_rating(self, value):
@@ -65,7 +59,7 @@ class Profile(db.Model):
         self.average_rating = self.total_rating / self.times_rated
 
     def increase_tier_points(self):
-        if (self.tier_points < 10):
+        if self.tier_points < 10:
             self.tier_points += 1
             self.update_tier()
 
@@ -82,5 +76,5 @@ class Profile(db.Model):
             return
         self.reset_views_left()
 
-    def reset_views_left():
+    def reset_views_left(self):
         self.views_left = self.views_per_tier[self.tier]

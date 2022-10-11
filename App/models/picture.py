@@ -1,18 +1,19 @@
 from App.database import db
 from sqlalchemy.ext.associationproxy import association_proxy
 
+
 class Picture(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'))
+    profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
     url = db.Column(db.String, nullable=False)
     times_rated = db.Column(db.Integer, nullable=False, default=0)
     total_rating = db.Column(db.Integer, nullable=False, default=0)
     average_rating = db.Column(db.Integer, nullable=False, default=0)
 
-    ''' NEW RELATIONSHIPS '''
-    profile = db.relationship('Profile', back_populates='pictures')
-    rating_assoc = db.relationship('PictureRating', back_populates='ratee')
-    ratings = association_proxy('rating_assoc', 'rater')
+    """ NEW RELATIONSHIPS """
+    profile = db.relationship("Profile", back_populates="pictures")
+    rating_assoc = db.relationship("PictureRating", back_populates="ratee")
+    ratings = association_proxy("rating_assoc", "rater")
 
     def toJSON(self):
         return {
@@ -21,7 +22,7 @@ class Picture(db.Model):
             "url": self.url,
             "times-rated": self.times_rated,
             "total-rating": self.total_rating,
-            "average-rating": self.average_rating
+            "average-rating": self.average_rating,
         }
 
     def receive_rating(self, value):

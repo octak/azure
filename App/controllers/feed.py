@@ -1,6 +1,5 @@
-from App.controllers import *
 from App.database import db
-from App.models import *
+from App.models import Feed, Profile
 
 
 def create_feed():
