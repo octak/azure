@@ -1,5 +1,3 @@
-from functools import singledispatch
-
 from App.database import db
 from App.models import Picture, PictureRating, Profile, ProfileRating
 
@@ -15,30 +13,22 @@ def create_profile(username, password):
 
 
 def get_all_profiles():
-    """Returns a list of all profiles."""
+    """Returns all profiles."""
     return Profile.query.all()
 
 
-@singledispatch
-def get_profile(key):
-    raise NotImplementedError
+def get_profile(identifier):
+    """Returns the profile represented by the supplied identifier."""
+    if isinstance(identifier, int):
+        profile = Profile.query.get(identifier)
+    elif isinstance(identifier, str):
+        profile = Profile.query.filter_by(username=identifier).first()
+    return profile if profile else None
 
 
-@get_profile.register
-def _(key: int):
-    """Returns profile represented by the supplied ID."""
-    return Profile.query.get(key)
-
-
-@get_profile.register
-def _(key: str):
-    """Returns profile represented by the supplied username."""
-    return Profile.query.filter_by(username=key).first()
-
-
-def update_username(key, username):
+def update_username(identifier, username):
     """Attempts to update a username. Returns False if profile does not exist or username is in use."""
-    profile = get_profile(key)
+    profile = get_profile(identifier)
     if profile and not get_profile(username):
         profile.username = username
         db.session.add(profile)
@@ -47,9 +37,9 @@ def update_username(key, username):
     return False
 
 
-def upload_picture(key, url):
+def upload_picture(identifier, url):
     """Adds a picture to a profile. Returns False if profile does not exist."""
-    profile = get_profile(key)
+    profile = get_profile(identifier)
     if not profile:
         return False
     picture = Picture(url=url, profile=profile)
@@ -64,27 +54,27 @@ def sort_pictures(pictures):
     return pictures
 
 
-def get_uploaded_pictures(key):
+def get_uploaded_pictures(identifier):
     """Returns all pictures uploaded by the specified profile."""
-    profile = get_profile(key)
+    profile = get_profile(identifier)
     return profile.pictures if profile else []
 
 
-def get_rated_profiles(key):
+def get_rated_profiles(identifier):
     """Returns all profiles rated by the specified profile."""
-    profile = get_profile(key)
+    profile = get_profile(identifier)
     return profile.rated_profiles if profile else []
 
 
-def get_rated_pictures(key):
+def get_rated_pictures(identifier):
     """Returns all pictures rated by the specified profile."""
-    profile = get_profile(key)
+    profile = get_profile(identifier)
     return profile.rated_pictures if profile else []
 
 
-def get_raters(key):
+def get_raters(identifier):
     """Returns all profiles which rated the specified profile."""
-    profile = get_profile(key)
+    profile = get_profile(identifier)
     return profile.ratings if profile else []
 
 
