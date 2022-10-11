@@ -56,6 +56,16 @@ def get_rated_pictures(username):
         else jsonify([])
     )
 
+@profile_views.route("/feed", methods=["GET"])
+def get_feed():
+    ''' 
+    This function should probably return the Feed. 
+    Should probably be about 5 randomly chosen profiles each time the request is made,
+    until there are none with remaining views. Also, remember to stop dropping all
+    the tables in the database when the app is run.
+    '''
+    pass
+
 
 @profile_views.route("/profile", methods=["POST"])
 def create_new_profile():
