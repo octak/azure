@@ -20,6 +20,7 @@ def initialiseDB():
     feed = create_feed()
 
     user_azure = create_profile("azure", "no-exceptions")
+    user_azure2 = create_profile("azure", "no-exceptions")
     user_cerulean = create_profile("cerulean", "shayach-li")
 
     upload_picture("azure", "wikipedia.org/azure")

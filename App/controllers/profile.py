@@ -6,19 +6,17 @@ def create_profile(username, password):
     """Attempts to create a new profile. Returns None if username is in use."""
     if Profile.query.filter_by(username=username).first():
         return None
-    new_profile = Profile(username=username, password=password)
-    db.session.add(new_profile)
+    profile = Profile(username=username, password=password)
+    db.session.add(profile)
     db.session.commit()
-    return new_profile
+    return profile
 
 
 def get_all_profiles():
-    """Returns all profiles."""
     return Profile.query.all()
 
 
 def get_profile(identifier):
-    """Returns the profile represented by the supplied identifier."""
     if isinstance(identifier, int):
         profile = Profile.query.get(identifier)
     elif isinstance(identifier, str):
@@ -60,24 +58,6 @@ def get_uploaded_pictures(identifier):
     return profile.pictures if profile else []
 
 
-def get_rated_profiles(identifier):
-    """Returns all profiles rated by the specified profile."""
-    profile = get_profile(identifier)
-    return profile.rated_profiles if profile else []
-
-
-def get_rated_pictures(identifier):
-    """Returns all pictures rated by the specified profile."""
-    profile = get_profile(identifier)
-    return profile.rated_pictures if profile else []
-
-
-def get_raters(identifier):
-    """Returns all profiles which rated the specified profile."""
-    profile = get_profile(identifier)
-    return profile.ratings if profile else []
-
-
 def rate_profile(rater_id, ratee_id, value):
     rater = get_profile(rater_id)
     ratee = get_profile(ratee_id)
@@ -88,7 +68,7 @@ def rate_profile(rater_id, ratee_id, value):
         ratee.update_rating(rating.value - value)
         rating.value = value
     else:
-        rating = ProfileRating(rater=rater, ratee=ratee, value=value)
+        rating = ProfileRating(rater_id=rater.id, ratee_id=ratee.id, value=value)
         ratee.receive_rating(value)
         rater.increase_tier_points()
     db.session.add_all([rater, ratee, rating])
@@ -106,7 +86,7 @@ def rate_picture(rater_id, ratee_id, value):
         ratee.update_rating(rating.value - value)
         rating.value = value
     else:
-        rating = PictureRating(rater=rater, ratee=ratee, value=value)
+        rating = PictureRating(rater_id=rater.id, ratee_id=ratee.id, value=value)
         ratee.receive_rating(value)
     db.session.add_all([rater, ratee, rating])
     db.session.commit()

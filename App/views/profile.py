@@ -1,14 +1,6 @@
-from flask_jwt import jwt_required
-from flask import (
-    Blueprint,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    send_from_directory,
-)
-
 from App.controllers import profile as profile_controller
+from flask import (Blueprint, jsonify, redirect, render_template, request, send_from_directory)
+from flask_jwt import jwt_required
 
 profile_views = Blueprint("profile_views", __name__, template_folder="../templates")
 
@@ -19,52 +11,20 @@ def get_all_profiles():
     return jsonify([profile.toJSON() for profile in profiles])
 
 
-@profile_views.route("/profiles/<username>", methods=["GET"])
-def get_profile(username):
-    profile = profile_controller.get_profile(username)
+@profile_views.route("/profile/<id>", methods=["GET"])
+def get_profile(id):
+    profile = profile_controller.get_profile(id)
     return jsonify(profile.toJSON()) if profile else jsonify({'message': 'Profile does not exist.'})
 
 
-@profile_views.route("/profiles/<username>/pictures", methods=["GET"])
-def get_pictures_from(username):
-    profile = profile_controller.get_profile(username)
+@profile_views.route("/profiles/<id>/pictures", methods=["GET"])
+def get_pictures_from(id):
+    profile = profile_controller.get_profile(id)
     return (
         jsonify([picture.toJSON() for picture in profile.pictures])
         if profile
         else jsonify([])
     )
-
-
-# Maybe API endpoint could be /profiles?rater=<username>
-@profile_views.route("/profiles/<username>/rated-profiles", methods=["GET"])
-def get_rated_profiles(username):
-    profile = profile_controller.get_profile(username)
-    return (
-        jsonify([profile_.toJSON() for profile_ in profile.rated_profiles])
-        if profile
-        else jsonify([])
-    )
-
-
-# Maybe API endpoint could be /pictures?rater=<username>
-@profile_views.route("/profiles/<username>/rated-pictures", methods=["GET"])
-def get_rated_pictures(username):
-    profile = get_profile(username)
-    return (
-        jsonify([picture.toJSON() for picture in profile.rated_pictures])
-        if profile
-        else jsonify([])
-    )
-
-@profile_views.route("/feed", methods=["GET"])
-def get_feed():
-    ''' 
-    This function should probably return the Feed. 
-    Should probably be about 5 randomly chosen profiles each time the request is made,
-    until there are none with remaining views. Also, remember to stop dropping all
-    the tables in the database when the app is run.
-    '''
-    pass
 
 
 @profile_views.route("/profile", methods=["POST"])

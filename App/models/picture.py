@@ -10,10 +10,7 @@ class Picture(db.Model):
     total_rating = db.Column(db.Integer, nullable=False, default=0)
     average_rating = db.Column(db.Integer, nullable=False, default=0)
 
-    """ NEW RELATIONSHIPS """
     profile = db.relationship("Profile", back_populates="pictures")
-    rating_assoc = db.relationship("PictureRating", back_populates="ratee")
-    ratings = association_proxy("rating_assoc", "rater")
 
     def toJSON(self):
         return {
