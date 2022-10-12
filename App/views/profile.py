@@ -5,25 +5,25 @@ from flask_jwt import jwt_required
 profile_views = Blueprint("profile_views", __name__, template_folder="../templates")
 
 
-@profile_views.route("/profiles", methods=["GET"])
+@profile_views.route("/api/profiles", methods=["GET"])
 def get_all_profiles():
     profiles = profile_controller.get_all_profiles()
     return jsonify([profile.toJSON() for profile in profiles])
 
 
-@profile_views.route("/profile/<id>", methods=["GET"])
+@profile_views.route("/api/profiles/<id>", methods=["GET"])
 def get_profile(id):
     profile = profile_controller.get_profile(id)
     return jsonify(profile.toJSON()) if profile else jsonify({'message': 'Profile does not exist.'})
 
 
-@profile_views.route("/profiles/<id>/pictures", methods=["GET"])
+@profile_views.route("/api/profiles/<id>/uploads", methods=["GET"])
 def get_pictures_from(id):
     profile = profile_controller.get_profile(id)
     return (
         jsonify([picture.toJSON() for picture in profile.pictures])
         if profile
-        else jsonify([])
+        else jsonify({'message': 'Profile does not exist.'})
     )
 
 
@@ -40,11 +40,11 @@ def create_new_profile():
     if profile_controller.create_profile(
         profile_data["username"], profile_data["password"]
     ):
-        return jsonify({"message", "Profile sucessfully created."})
-    return jsonify({"message", "Error: Profile with that username already exists."})
+        return jsonify({"message", "Profile created."})
+    return jsonify({"message", "Profile with that username already exists."})
 
 
-@profile_views.route("/profiles/<username>/upload", methods=["POST"])
+@profile_views.route("/picture", methods=["POST"])
 def upload_picture(username):
     """
     Request body:
@@ -61,7 +61,7 @@ def upload_picture(username):
     return jsonify({"message", "Picture sucessfully uploaded."})
 
 
-@profile_views.route("/profiles/<username>/rate-profile", methods=["POST"])
+@profile_views.route("/pictures/rating", methods=["POST"])
 def rate_profile(username):
     """
     Request body:
@@ -82,7 +82,7 @@ def rate_profile(username):
     return jsonify({"message", "Success"})
 
 
-@profile_views.route("/profiles/<username>/rate-picture", methods=["POST"])
+@profile_views.route("/profiles/rating", methods=["POST"])
 def rate_picture(username):
     """
     Request body:
