@@ -35,15 +35,6 @@ def initialiseDB():
     rate_profile(user_azure.id, user_cerulean.id, 1)
     rate_profile(user_azure.id, user_cerulean.id, 5)
 
-    print(refresh_views())
-    print(generate_feed())
-
-    print(refresh_views())
-    print(generate_feed())
-
-    print(generate_feed())
-
     print("Database initialised.")
-
 
 app.cli.add_command(test)

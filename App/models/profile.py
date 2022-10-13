@@ -16,7 +16,6 @@ class Profile(db.Model):
     views_left = db.Column(db.Integer, default=views_per_tier[1])
 
     pictures = db.relationship("Picture", back_populates="profile")
-    ratings = db.relationship("ProfileRatings", back_populates="profile")
 
     def __init__(self, username, password):
         self.username = username
@@ -28,18 +27,33 @@ class Profile(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    def toJSON(self):
+    # def toJSON(self):
+    #     return {
+    #         "id": self.id,
+    #         "username": self.username,
+    #         # "password": self.password,
+    #         "tier": self.tier,
+    #         # "tier-points": self.tier_points,
+    #         # "times-rated": self.times_rated,
+    #         # "total-rating": self.total_rating,
+    #         "average-rating": self.average_rating,
+    #         "pictures": [picture.toJSON() for picture in self.pictures]
+    #         # "views-left": self.views_left
+    #     }
+
+    def serialize_pictures(self) -> dict:
+        pictures = {}
+        for _, picture in enumerate(self.pictures):
+            pictures[_] = picture.serialize()
+        return pictures
+
+    def serialize(self) -> dict:
         return {
             "id": self.id,
             "username": self.username,
-            # "password": self.password,
             "tier": self.tier,
-            # "tier-points": self.tier_points,
-            # "times-rated": self.times_rated,
-            # "total-rating": self.total_rating,
             "average-rating": self.average_rating,
-            "pictures": [picture.toJSON() for picture in self.pictures]
-            # "views-left": self.views_left
+            "pictures": self.serialize_pictures()
         }
 
     def receive_rating(self, value):

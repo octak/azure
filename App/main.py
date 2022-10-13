@@ -42,10 +42,11 @@ def loadConfig(app, config):
 
 
 def create_app(config={}):
-    app = Flask(__name__, static_url_path="/static")
+    app = Flask(__name__, static_url_path="/static")    
     CORS(app)
     loadConfig(app, config)
     app.config["JWT_EXPIRATION_DELTA"] = timedelta(days=7)
+    app.config["JWT_SECRET_KEY"] = "aa2bded32cc585d3f37c5319abe8890ad28a697ed66d5823f10536cc9c0fdb9"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["PREFERRED_URL_SCHEME"] = "https"
@@ -55,5 +56,6 @@ def create_app(config={}):
     add_views(app, views)
     create_db(app)
     setup_jwt(app)
+    jwt = JWTManager(app)
     app.app_context().push()
     return app

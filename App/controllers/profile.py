@@ -12,6 +12,13 @@ def create_profile(username, password):
     return profile
 
 
+def serialize_profiles(profile_list) -> dict:
+        profiles = {}
+        for _, profile in enumerate(profile_list):
+            profiles[_] = profile.serialize()
+        return profiles
+
+
 def get_all_profiles():
     return Profile.query.all()
 
@@ -23,6 +30,9 @@ def get_profile(identifier):
         profile = Profile.query.filter_by(username=identifier).first()
     return profile if profile else None
 
+def get_picture(id):
+    picture = Picture.query.get(id)
+    return picture if picture else None
 
 def update_username(identifier, username):
     """Attempts to update a username. Returns False if profile does not exist or username is in use."""
@@ -50,12 +60,6 @@ def sort_pictures(pictures):
     """Sorts pictures in order of highest to lowest rating."""
     pictures.sort(key=lambda picture: picture.average_rating, reverse=True)
     return pictures
-
-
-def get_uploaded_pictures(identifier):
-    """Returns all pictures uploaded by the specified profile."""
-    profile = get_profile(identifier)
-    return profile.pictures if profile else []
 
 
 def rate_profile(rater_id, ratee_id, value):

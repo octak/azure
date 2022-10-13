@@ -33,11 +33,12 @@ def refresh_views():
 
 def generate_feed():
     profiles = get_all_profiles()
+    refresh_views()
     listing = []
     if profiles:
         for profile in profiles:
             if profile.views_left != None and profile.views_left > 0:
-                listing.append(profile.toJSON())
+                listing.append(profile)
                 profile.views_left -= 1
                 db.session.add(profile)
         db.session.commit()
