@@ -12,16 +12,6 @@ class Picture(db.Model):
 
     profile = db.relationship("Profile", back_populates="pictures")
 
-    # def toJSON(self):
-    #     return {
-    #         "id": self.id,
-    #         "profile-id": self.profile_id,
-    #         "url": self.url,
-    #         "times-rated": self.times_rated,
-    #         "total-rating": self.total_rating,
-    #         "average-rating": self.average_rating
-    #     }
-
     def serialize(self) -> dict:
         return {
             'id': self.id,

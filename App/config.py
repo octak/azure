@@ -1,4 +1,4 @@
-SQLALCHEMY_DATABASE_URI = "sqlite:///BaseOfData.db"
+SQLALCHEMY_DATABASE_URI = "sqlite:///Profile-App.db"
 
 SECRET_KEY = "secret key"
 JWT_EXPIRATION_DELTA = 7

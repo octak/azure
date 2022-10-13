@@ -27,20 +27,6 @@ class Profile(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    # def toJSON(self):
-    #     return {
-    #         "id": self.id,
-    #         "username": self.username,
-    #         # "password": self.password,
-    #         "tier": self.tier,
-    #         # "tier-points": self.tier_points,
-    #         # "times-rated": self.times_rated,
-    #         # "total-rating": self.total_rating,
-    #         "average-rating": self.average_rating,
-    #         "pictures": [picture.toJSON() for picture in self.pictures]
-    #         # "views-left": self.views_left
-    #     }
-
     def serialize_pictures(self) -> dict:
         pictures = {}
         for _, picture in enumerate(self.pictures):
