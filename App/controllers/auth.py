@@ -1,6 +1,6 @@
 import flask_login
 from App.models import Profile
-from flask_jwt import JWT
+from flask_jwt_extended import JWT
 
 
 def authenticate(username, password):
