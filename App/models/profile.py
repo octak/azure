@@ -16,6 +16,7 @@ class Profile(db.Model):
     views_left = db.Column(db.Integer, default=views_per_tier[1])
 
     pictures = db.relationship("Picture", back_populates="profile")
+    ratings = db.relationship("ProfileRatings", back_populates="profile")
 
     def __init__(self, username, password):
         self.username = username
