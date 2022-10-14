@@ -32,6 +32,10 @@ def refresh_views():
 
 
 def generate_feed():
+    feed = Feed.query.first()
+    if not feed:
+        create_feed();
+        
     profiles = get_all_profiles()
     refresh_views()
     listing = []
