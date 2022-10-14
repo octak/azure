@@ -72,15 +72,15 @@ from App.database import create_db
 
 
 from App.views import (
-    user_views,
-    index_views
+    index_views,
+    profile_views
 )
 
 # New views must be imported and added to this list
 
 views = [
-    user_views,
-    index_views
+    index_views,
+    profile_views
 ]
 
 def add_views(app, views):
