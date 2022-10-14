@@ -3,10 +3,7 @@ from datetime import timedelta
 
 from flask import Flask
 from flask_cors import CORS
-from flask_login import LoginManager, current_user
 from flask_uploads import DOCUMENTS, IMAGES, TEXT, UploadSet, configure_uploads
-from werkzeug.datastructures import FileStorage
-from werkzeug.utils import secure_filename
 
 from App.controllers import setup_jwt
 from App.database import create_db

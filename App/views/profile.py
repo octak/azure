@@ -1,9 +1,7 @@
-from platform import architecture
 from App.controllers import profile as profile_controller, feed as feed_controller
-from flask import Blueprint, Flask, jsonify, make_response, redirect, render_template, request, send_from_directory
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
-from App.controllers.auth import identity
 
 profile_views = Blueprint("profile_views", __name__, template_folder="../templates")
 
