@@ -4,8 +4,9 @@ from datetime import timedelta
 from flask import Flask
 from flask_cors import CORS
 from flask_uploads import DOCUMENTS, IMAGES, TEXT, UploadSet, configure_uploads
+from flask_jwt_extended import JWTManager
 
-from App.controllers import setup_jwt
+# from App.controllers import setup_jwt
 from App.database import create_db
 from App.views import *
 
@@ -52,7 +53,7 @@ def create_app(config={}):
     configure_uploads(app, photos)
     add_views(app, views)
     create_db(app)
-    setup_jwt(app)
+    # setup_jwt(app)
     jwt = JWTManager(app)
     app.app_context().push()
     return app
