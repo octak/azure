@@ -66,7 +66,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import  FileStorage
 from datetime import timedelta
-
+from flask_jwt_extended import JWTManager
 
 from App.database import create_db
 
@@ -120,6 +120,7 @@ def create_app(config={}):
     add_views(app, views)
     create_db(app)
     # setup_jwt(app)
+    jwt = JWTManager(app)
     app.app_context().push()
     return app
 
