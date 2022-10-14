@@ -146,8 +146,8 @@ def get_feed():
     if not active_profile:
         return {'message' : 'INVALID CREDENTIALS'}, 401
 
-    feed = feed_controller.generate_feed()
-    if feed != []:
-        return profile_controller.serialize_profiles(feed)
+    feed_listing = feed_controller.generate_feed()
+    if feed_listing != []:
+        return profile_controller.serialize_profiles(feed_listing)
     else:
         return {'message': 'NO VIEWABLE PROFILES REMAINING, CHECK BACK IN 25 HOURS'}
