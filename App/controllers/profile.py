@@ -1,3 +1,4 @@
+from App.controllers import tier as tier_controller
 from App.database import db
 from App.models import Picture, PictureRating, Profile, ProfileRating
 
@@ -6,16 +7,17 @@ def create_profile(username, password):
     if Profile.query.filter_by(username=username).first():
         return None
     profile = Profile(username=username, password=password)
+    profile.set_views_left(tier_controller.get_tier_views(1))
     db.session.add(profile)
     db.session.commit()
     return profile
 
 
 def serialize_profiles(profile_list) -> dict:
-        profiles = {}
-        for _, profile in enumerate(profile_list):
-            profiles[_] = profile.serialize()
-        return profiles
+    profiles = {}
+    for _, profile in enumerate(profile_list):
+        profiles[_] = profile.serialize()
+    return profiles
 
 
 def get_all_profiles():
@@ -29,9 +31,11 @@ def get_profile(identifier):
         profile = Profile.query.filter_by(username=identifier).first()
     return profile if profile else None
 
-def get_picture(id):
-    picture = Picture.query.get(id)
+
+def get_picture(picture_id):
+    picture = Picture.query.get(picture_id)
     return picture if picture else None
+
 
 def update_username(identifier, username):
     """Attempts to update a username. Returns False if profile does not exist or username is in use."""
@@ -73,7 +77,7 @@ def rate_profile(rater_id, ratee_id, value):
     else:
         rating = ProfileRating(rater_id=rater.id, ratee_id=ratee.id, value=value)
         ratee.receive_rating(value)
-        rater.increase_tier_points()
+        tier_controller.update_tier_information(rater)
     db.session.add_all([rater, ratee, rating])
     db.session.commit()
     return True

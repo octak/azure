@@ -1,9 +1,10 @@
-from App.controllers import profile as profile_controller, feed as feed_controller
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
+from App.controllers import profile as profile_controller, feed as feed_controller
 
 profile_views = Blueprint("profile_views", __name__, template_folder="../templates")
+
 
 def profile_from_identity(identity):
     if identity:
@@ -12,6 +13,7 @@ def profile_from_identity(identity):
             return profile
     return None
 
+
 @profile_views.route("/profile", methods=["POST"])
 def create_new_profile():
     request_data = request.get_json()
@@ -19,9 +21,9 @@ def create_new_profile():
     password = request_data['password']
 
     if profile_controller.create_profile(username, password):
-        return {'message': 'PROFILE CREATED'}, 201
+        return {'message': 'created'}, 201
     else:
-        return {'message': 'USERNAME ALREADY TAKEN'}, 400
+        return {'message': 'username unavailable'}, 400
 
 
 @profile_views.route("/profiles", methods=["GET"])
@@ -37,13 +39,13 @@ def get_active_profile():
     if profile:
         return profile.serialize()
     else:
-        return {'message' : 'INVALID CREDENTIALS'}, 401
+        return {'message': 'invalid credentials'}, 401
 
 
 @profile_views.route("/profiles/<id>", methods=["GET"])
 def get_profile(id):
     profile = profile_controller.get_profile(int(id))
-    return profile.serialize() if profile else {'message': 'NON-EXISTENT PROFILE'}
+    return profile.serialize() if profile else {'message': 'profile does not exist'}, 404
 
 
 @profile_views.route('/login', methods=['GET'])
@@ -55,10 +57,10 @@ def login():
     if username and password:
         profile = profile_controller.get_profile(username)
         if profile and profile.check_password(password):
-            token =  create_access_token(identity=username)
-            return jsonify(token=token)
+            token = create_access_token(identity=username)
+            return jsonify(token=token), 201
     else:
-        return jsonify({'message' : 'INVALID CREDENTIALS'}), 401
+        return jsonify({'message': 'INVALID CREDENTIALS'}), 401
 
 
 @profile_views.route('/profiles/rating', methods=['POST'])
@@ -67,17 +69,17 @@ def add_profile_rating():
     request_data = request.get_json()
     ratee_id = request_data['ratee_id']
     value = request_data['value']
-     
+
     active_profile = profile_from_identity(get_jwt_identity())
     if not active_profile:
-        return jsonify({'message' : 'INVALID CREDENTIALS'}), 401
-    
+        return jsonify({'message': 'invalid credentials'}), 401
+
     if not profile_controller.get_profile(ratee_id):
-        return jsonify({'message' : 'NON-EXISTENT PROFILE'}), 401
+        return jsonify({'message': 'profile does not exist'}), 401
 
     profile_controller.rate_profile(active_profile.id, ratee_id, value)
 
-    return jsonify({'message' : 'SUCCESS'}), 201
+    return jsonify({'message': 'successful'}), 201
 
 
 @profile_views.route('/pictures/rating', methods=['POST'])
@@ -89,14 +91,14 @@ def add_picture_rating():
 
     active_profile = profile_from_identity(get_jwt_identity())
     if not active_profile:
-        return jsonify({'message' : 'INVALID CREDENTIALS'}), 401
-    
+        return jsonify({'message': 'invalid credentials'}), 401
+
     if not profile_controller.get_picture(int(ratee_id)):
-        return jsonify({'message' : 'NON-EXISTENT PICTURE'}), 401
+        return jsonify({'message': 'picture does not exist'}), 401
 
     profile_controller.rate_picture(active_profile.id, ratee_id, value)
 
-    return jsonify({'message' : 'SUCCESS'}), 201
+    return jsonify({'message': 'successful'}), 201
 
 
 @profile_views.route("/picture", methods=["POST"])
@@ -108,14 +110,14 @@ def upload_picture():
     active_profile = profile_from_identity(get_jwt_identity())
 
     if not active_profile:
-        return jsonify({'message' : 'INVALID CREDENTIALS'}), 401
+        return jsonify({'message': 'invalid credentials'}), 401
 
     if not url:
-        return jsonify({'message' : 'INVALID URL'}), 401
+        return jsonify({'message': 'invalid url'}), 401
 
     profile_controller.upload_picture(active_profile.id, url)
-    
-    return jsonify({'message' : 'SUCCESS'}), 201    
+
+    return jsonify({'message': 'successful'}), 201
 
 
 @profile_views.route("/pictures", methods=["GET"])
@@ -124,9 +126,9 @@ def get_active_profile_pictures():
     active_profile = profile_from_identity(get_jwt_identity())
 
     if not active_profile:
-        return {'message' : 'INVALID CREDENTIALS'}, 401
+        return {'message': 'invalid credentials'}, 401
 
-    return active_profile.serialize_pictures()
+    return active_profile.serialize_pictures(), 200
 
 
 @profile_views.route("/profiles/<id>/pictures", methods=["GET"])
@@ -135,7 +137,7 @@ def get_pictures_from_profile(id):
     if profile:
         return profile.serialize_pictures()
     else:
-        return {'message': 'NON-EXISTENT PROFILE'}
+        return {'message': 'profile does not exist'}, 404
 
 
 @profile_views.route("/feed", methods=["GET"])
@@ -144,10 +146,10 @@ def get_feed():
     active_profile = profile_from_identity(get_jwt_identity())
 
     if not active_profile:
-        return {'message' : 'INVALID CREDENTIALS'}, 401
+        return {'message': 'invalid credentials'}, 401
 
     feed_listing = feed_controller.generate_feed()
-    if feed_listing != []:
+    if feed_listing:
         return profile_controller.serialize_profiles(feed_listing)
     else:
-        return {'message': 'NO VIEWABLE PROFILES REMAINING, CHECK BACK IN 25 HOURS'}
+        return {'message': 'no more viewable profiles, check again tomorrow'}, 404

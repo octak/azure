@@ -1,10 +1,9 @@
-from App.database import db
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from App.database import db
 
 
 class Profile(db.Model):
-    views_per_tier = {1: 2, 2: 4, 3: 6, 4: 8, 5: 10}
-
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
@@ -13,7 +12,7 @@ class Profile(db.Model):
     times_rated = db.Column(db.Integer, nullable=False, default=0)
     total_rating = db.Column(db.Integer, nullable=False, default=0)
     average_rating = db.Column(db.Integer, nullable=False, default=0)
-    views_left = db.Column(db.Integer, default=views_per_tier[1])
+    views_left = db.Column(db.Integer, default=0)
 
     pictures = db.relationship("Picture", back_populates="profile")
     ratings = db.relationship("ProfileRating", backref="rater")
@@ -53,13 +52,12 @@ class Profile(db.Model):
         self.total_rating -= value
         self.average_rating = self.total_rating / self.times_rated
 
-    def upgrade_tier(self, tier_info):
-        if tier_info:
-            self.tier = tier_info['tier']
-            self.tier_points = tier_info['tier_points']
-            self.views_left =  tier_info['views_left']
-
     def add_tier_point(self):
         if self.tier_points < 10:
             self.tier_points += 1
-            self.update_tier()
+
+    def set_tier(self, tier):
+        self.tier = tier
+
+    def set_views_left(self, views_left):
+        self.views_left = views_left

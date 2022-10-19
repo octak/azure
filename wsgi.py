@@ -1,41 +1,36 @@
-import sys
-
-import click
-import pytest
-from flask import Flask
-from flask.cli import AppGroup, with_appcontext
+from flask.cli import AppGroup
 
 from App.controllers import *
-from App.database import create_db, get_migrate
+from App.database import get_migrate
 from App.main import create_app
-
-from App.models import feed
 
 app = create_app()
 migrate = get_migrate(app)
-test = AppGroup("test", help="Testing commands.")
+
+init = AppGroup("init")
 
 
-@test.command("i", help="Attempts to create and set up the database.")
-def initialiseDB():
-    feed = create_feed()
+@init.command("i")
+def initialize_database():
+    user_azure = create_profile("azure", "password")
+    user_cerulean = create_profile("cerulean", "password")
 
-    user_azure = create_profile("azure", "no-exceptions")
-    user_cerulean = create_profile("cerulean", "shayach-li")
+    upload_picture('azure', 'picture_one')
+    upload_picture('azure', 'picture_uno')
+    upload_picture('azure', 'picture_dos')
 
-    # upload_picture("azure", "wikipedia.org/azure")
-    # upload_picture(user_cerulean.id, "wikipedia.org/cerulean")
+    rate_picture(user_cerulean.id, 1, 5)
+    rate_picture(user_cerulean.id, 2, 1)
 
-    # print("All Pictures:", end="")
-    # print(Picture.query.all())
+    rate_profile(user_cerulean.id, user_azure.id, 1)
+    rate_profile(user_cerulean.id, user_azure.id, 10)
 
-    # rate_profile(user_azure.id, user_cerulean.id, 1)
-    # rate_profile(user_azure.id, user_cerulean.id, 5)
+    rate_profile(user_azure.id, user_cerulean.id, 20)
 
-    print("Database initialised.")
+    print("COMPLETED!")
 
     print(feed.refresh())
     print(feed.refresh())
 
 
-app.cli.add_command(test)
+app.cli.add_command(init)
