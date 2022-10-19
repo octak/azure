@@ -1,5 +1,4 @@
 from App.database import db
-from sqlalchemy.ext.associationproxy import association_proxy
 
 
 class Picture(db.Model):

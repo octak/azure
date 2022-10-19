@@ -1,20 +1,24 @@
-from datetime import date, datetime, timedelta
+import json
+from datetime import datetime
 
-from App.database import db
 
+def current_time_ms():
+    return round(datetime.utcnow().timestamp() * 1000)  # timestamp in ms
 
-class Feed(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    last_refresh = db.Column(db.DateTime(timezone=True), default=datetime.now())
-
-    def toJSON(self):
-        return {"last-refresh": self.last_refresh, "current-time": datetime.now()}
-
-    def refresh(self):
-        current_time = datetime.now()
-        time_since_last_refresh = current_time - self.last_refresh
-
-        if time_since_last_refresh.days >= 1:
-            self.last_refresh = current_time
+def refresh():
+    filename = 'App/feed_config.json'
+    try:
+        with open(filename, 'r') as config_file:
+            config_data = json.load(config_file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        with open(filename, 'w') as config_file:
+            config_data = {'last_refresh': current_time_ms()}
+            json.dump(config_data, config_file)
             return True
-        return False
+    else:
+        if current_time_ms() - config_data['last_refresh'] >= 86400000:
+            config_data['last_refresh'] = current_time_ms()
+            json.dump(config_data, config_file)
+            return True
+        else:
+            return False
