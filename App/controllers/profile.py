@@ -3,7 +3,6 @@ from App.models import Picture, PictureRating, Profile, ProfileRating
 
 
 def create_profile(username, password):
-    """Attempts to create a new profile. Returns None if username is in use."""
     if Profile.query.filter_by(username=username).first():
         return None
     profile = Profile(username=username, password=password)

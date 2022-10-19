@@ -53,23 +53,13 @@ class Profile(db.Model):
         self.total_rating -= value
         self.average_rating = self.total_rating / self.times_rated
 
-    def increase_tier_points(self):
+    def upgrade_tier(self, tier_info):
+        if tier_info:
+            self.tier = tier_info['tier']
+            self.tier_points = tier_info['tier_points']
+            self.views_left =  tier_info['views_left']
+
+    def add_tier_point(self):
         if self.tier_points < 10:
             self.tier_points += 1
             self.update_tier()
-
-    def update_tier(self):
-        if self.tier_points == 4:
-            self.tier = 2
-        elif self.tier_points == 6:
-            self.tier = 3
-        elif self.tier_points == 8:
-            self.tier = 4
-        elif self.tier_points == 10:
-            self.tier = 5
-        else:
-            return
-        self.reset_views_left()
-
-    def reset_views_left(self):
-        self.views_left = self.views_per_tier[self.tier]
