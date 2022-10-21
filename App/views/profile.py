@@ -7,11 +7,7 @@ profile_views = Blueprint("profile_views", __name__, template_folder="../templat
 
 
 def profile_from_identity(identity):
-    if identity:
-        profile = profile_controller.get_profile(identity)
-        if profile:
-            return profile
-    return None
+    return profile_controller.get_profile(identity) if identity else None
 
 
 @profile_views.route("/profile", methods=["POST"])
@@ -42,13 +38,13 @@ def get_active_profile():
         return {'message': 'invalid credentials'}, 401
 
 
-@profile_views.route("/profiles/<id>", methods=["GET"])
-def get_profile(id):
-    profile = profile_controller.get_profile(int(id))
+@profile_views.route("/profiles/<int:profile_id>", methods=["GET"])
+def get_profile(profile_id):
+    profile = profile_controller.get_profile(profile_id)
     return profile.serialize() if profile else {'message': 'profile does not exist'}, 404
 
 
-@profile_views.route('/login', methods=['GET'])
+@profile_views.route('/login', methods=['POST'])
 def login():
     request_data = request.get_json()
     username = request_data['username']
@@ -131,9 +127,9 @@ def get_active_profile_pictures():
     return active_profile.serialize_pictures(), 200
 
 
-@profile_views.route("/profiles/<id>/pictures", methods=["GET"])
-def get_pictures_from_profile(id):
-    profile = profile_controller.get_profile(int(id))
+@profile_views.route("/profiles/<int:profile_id>/pictures", methods=["GET"])
+def get_pictures_from_profile(profile_id):
+    profile = profile_controller.get_profile(profile_id)
     if profile:
         return profile.serialize_pictures()
     else:
@@ -152,4 +148,4 @@ def get_feed():
     if feed_listing:
         return profile_controller.serialize_profiles(feed_listing)
     else:
-        return {'message': 'no more viewable profiles, check again tomorrow'}, 404
+        return {'message': 'no viewable profiles, check again tomorrow'}, 404

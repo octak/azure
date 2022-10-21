@@ -15,14 +15,11 @@ class Picture(db.Model):
         return {
             'id': self.id,
             'url': self.url,
-            'average-rating': self.average_rating
+            'average_rating': self.average_rating
         }
 
-    def receive_rating(self, value):
-        self.times_rated += 1
+    def update_rating(self, value: int, is_new: bool):
+        if is_new:
+            self.times_rated += 1
         self.total_rating += value
-        self.average_rating = self.total_rating / self.times_rated
-
-    def update_rating(self, value):
-        self.total_rating -= value
         self.average_rating = self.total_rating / self.times_rated
