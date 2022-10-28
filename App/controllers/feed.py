@@ -12,6 +12,8 @@ def current_time_ms():
 
 
 def refresh(filename='App/feed_config.json'):
+    """ Takes the current time in milliseconds and writes it to a file.
+        Reads the file and compares to current time. Modifies if needed. """
     # filename = 'App/feed_config.json'
     try:
         with open(filename, 'r') as config_file:

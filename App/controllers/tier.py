@@ -5,3 +5,5 @@ tier_info = {
     4: (8, 8),
     5: (10, 10)
 }
+
+""" All tier information is stored here. """

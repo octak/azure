@@ -19,6 +19,8 @@ class Picture(db.Model):
         }
 
     def update_rating(self, value: int, is_new: bool):
+        """ This will probably go back to the way it was before. This implementation
+            seems flawed. """
         if is_new:
             self.times_rated += 1
         self.total_rating += value
