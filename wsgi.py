@@ -1,6 +1,6 @@
 from flask.cli import AppGroup
 
-from App import controllers
+from App import controllers as cts
 from App.database import get_migrate
 from App.main import create_app
 
@@ -12,25 +12,37 @@ init = AppGroup("init")
 
 @init.command("i")
 def initialize_database():
-    user_azure = controllers.create_profile("azure", "password")
-    user_cerulean = controllers.create_profile("cerulean", "password")
+    u1 = cts.create_profile('u1', 'p1')
+    u2 = cts.create_profile('u2', 'p2')
+    u3 = cts.create_profile('u3', 'p2')
 
-    controllers.upload_picture('azure', 'picture_one')
-    controllers.upload_picture('azure', 'picture_uno')
-    controllers.upload_picture('azure', 'picture_dos')
+    cts.create_picture(u1.id, '猫')
+    cts.create_picture(u1.id, '图')
+    cts.create_picture(u1.id, '片')
 
-    controllers.rate_picture(user_cerulean.id, 1, 5)
-    controllers.rate_picture(user_cerulean.id, 2, 1)
+    cts.rate_picture(u1.id, 1, 10)
+    cts.rate_picture(u1.id, 2, 5)
+    cts.rate_picture(u1.id, 3, 10)
 
-    controllers.rate_profile(user_cerulean.id, user_azure.id, 1)
-    controllers.rate_profile(user_cerulean.id, user_azure.id, 10)
+    cts.rate_profile(u1.id, u2.id, 10)
+    cts.rate_profile(u1.id, u2.id, 20)
 
-    controllers.rate_profile(user_azure.id, user_cerulean.id, 20)
+    cts.rate_profile(u2.id, u1.id, 50)
+    cts.rate_profile(u3.id, u1.id, 26)
 
-    print("COMPLETED!")
+    print('Setup Complete !')
+    print(f'Average Rating of UUID1 : {cts.get_average_rating_for_profile(u1.id)}')
+    print('')
 
-    print(controllers.refresh())
-    print(controllers.refresh())
+    print('Users :')
+    print(cts.get_profiles())
+    print(f'User1 {cts.get_profiles()[0].username}')
+    print('')
+
+    print('User 1"s Posts :')
+    print(u1.pictures)
+
+    print(cts.to_dict_users([u1, u2, u3]))
 
 
 app.cli.add_command(init)

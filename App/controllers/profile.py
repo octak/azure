@@ -1,112 +1,145 @@
-from App.controllers import tier
+from typing import Optional
+
+from multimethod import multimethod
+from sqlalchemy import func
+
 from App.database import db
-from App.models import Picture, PictureRating, Profile, ProfileRating
+from App.models import Picture, PictureRating, User, ProfileRating
 
 
-def create_profile(username, password):
-    if Profile.query.filter_by(username=username).first():
-        return None
-    profile = Profile(username, password)
-    profile.remaining_views = tier.tier_info[1][1]
-    db.session.add(profile)
+# Serialization #######################################################################################################
+
+def to_dict_picture(picture: Picture) -> dict:
+    return {
+        "id": picture.id,
+        'url': picture.url,
+        'average_rating': get_average_rating_for_picture(picture.id)
+    }
+
+
+def to_dict_pictures(picture_list: list) -> dict:
+    pictures = {}
+    for _, picture in enumerate(picture_list):
+        pictures[_] = to_dict_picture(picture)
+    return pictures
+
+
+def to_dict_user(user: User) -> dict:
+    return {
+        "id": user.id,
+        "username": user.username,
+        "tier": user.tier,
+        "average_rating": get_average_rating_for_profile(user.id),
+        "pictures": to_dict_pictures(user.pictures)
+    }
+
+
+def to_dict_users(user_list: list) -> dict:
+    users = {}
+    for _, user in enumerate(user_list):
+        users[_] = to_dict_user(user)
+    return users
+
+
+# Services ############################################################################################################
+
+def create_profile(username: str, password: str) -> Optional[User]:
+    if not get_profile(username):
+        user = User(username=username, password=password)
+        db.session.add(user)
+        db.session.commit()
+        return user
+    return None
+
+
+def create_picture(user_id: int, url: str) -> Optional[Picture]:
+    user = get_profile(user_id)
+    if user:
+        post = Picture(user_id=user_id, url=url)
+        db.session.add(post)
+        db.session.commit()
+        return post
+    return None
+
+
+def rate_profile(rater_id, rated_id, value):
+    rater: User = get_profile(rater_id)
+    rated: User = get_profile(rated_id)
+    if not rater or not rated:
+        return
+    rating = get_profile_rating(rater_id, rated_id)
+    if not rating:
+        rating = ProfileRating(rater_id=rater.id, rated_id=rated.id, value=value)
+        rater.increase_tier_points()
+        db.session.add(rating)
+    else:
+        rating.value = value
     db.session.commit()
-    return profile
 
 
-def serialize_profiles(profile_list) -> dict:
-    profiles = {}
-    for _, profile in enumerate(profile_list):
-        profiles[_] = profile.serialize()
-    return profiles
-
-
-def get_all_profiles():
-    return Profile.query.all()
-
-
-def get_profile(identifier):
-    profile = None
-    if isinstance(identifier, int):
-        profile = Profile.query.get(identifier)
-    elif isinstance(identifier, str):
-        profile = Profile.query.filter_by(username=identifier).first()
-    return profile
-
-
-def get_picture(picture_id):
-    picture = Picture.query.get(picture_id)
-    return picture
-
-
-def update_username(identifier, username):
-    """Attempts to update a username. Returns False if profile does not exist or username is in use."""
-    profile = get_profile(identifier)
-    if profile and not get_profile(username):
-        # profile.username = username
-        profile.update_username(username)
-        # db.session.add(profile)
-        db.session.commit()
-        return True
-    return False
-
-
-def upload_picture(identifier, url):
-    """Adds a picture to a profile. Returns False if profile does not exist."""
-    profile = get_profile(identifier)
-    if profile:
-        picture = Picture(url=url, profile=profile)
-        db.session.add(picture)
-        db.session.commit()
-        return True
-    return False
-
-
-# def sort_pictures(pictures):
-#     """Sorts pictures in order of highest to lowest rating."""
-#     pictures.sort(key=lambda picture: picture.average_rating, reverse=True)
-#     return pictures
-
-
-def rate_profile(rater_id, ratee_id, value):
-    rater: Profile = get_profile(rater_id)
-    ratee: Profile = get_profile(ratee_id)
-
-    if rater and ratee:
-        rating = ProfileRating.query.get((rater_id, ratee_id))
-
-        if rating:
-            ratee.update_rating(value=value - rating.value, is_new=False)
-            rating.value = value
-        else:
-            rating = ProfileRating(rater_id=rater.id, ratee_id=ratee.id, value=value)
-            ratee.update_rating(value=value, is_new=True)
-            rater.add_tier_point(tier.tier_info)
-            db.session.add(rating)
-
-        # db.session.add_all([rater, ratee, rating])
-        db.session.commit()
-        return True
-
-    return False
-
-
-def rate_picture(rater_id, ratee_id, value):
+def rate_picture(rater_id, rated_id, value):
     rater = get_profile(rater_id)
-    ratee = get_picture(ratee_id)
+    rated = get_picture(rated_id)
+    if not rater or not rated:
+        return
+    rating = get_picture_rating(rater_id, rated_id)
+    if not rating:
+        rating = PictureRating(rater_id=rater.id, rated_id=rated.id, value=value)
+        db.session.add(rating)
+    else:
+        rating.value = value
+    db.session.commit()
 
-    if rater and ratee:
-        rating = PictureRating.query.get((rater_id, ratee_id))
 
-        if rating:
-            ratee.update_rating(value=value - rating.value, is_new=False)
-            rating.value = value
-        else:
-            rating = PictureRating(rater_id=rater.id, ratee_id=ratee.id, value=value)
-            ratee.update_rating(value=value, is_new=True)
-            db.session.add(rating)
-
-        # db.session.add_all([rater, ratee, rating])
+def generate_feed():
+    feed = []
+    users = get_profiles()
+    for user in users:
+        if user.is_viewable():
+            feed.append(user)
+            user.decrease_remaining_views()
         db.session.commit()
-        return True
+    return feed
 
-    return False
+
+# Selectors ###########################################################################################################
+def get_profiles() -> list:
+    return db.session.scalars(db.select(User)).all()
+
+
+@multimethod
+def get_profile(user_id: int) -> Optional[User]:
+    return db.session.scalars(db.select(User).where(User.id == user_id)).one_or_none()
+
+
+@multimethod
+def get_profile(username: str) -> Optional[User]:
+    return db.session.scalars(db.select(User).where(User.username == username)).one_or_none()
+
+
+def get_picture(post_id: int) -> Optional[Picture]:
+    return db.session.scalars(db.select(Picture).where(Picture.id == post_id)).one_or_none()
+
+
+def get_profile_rating(rater_id: int, object_id: int) -> Optional[ProfileRating]:
+    return db.session.scalars(db.select(ProfileRating)
+                              .where(ProfileRating.rater_id == rater_id,
+                                     ProfileRating.rated_id == object_id)).one_or_none()
+
+
+def get_picture_rating(rater_id: int, object_id: int) -> Optional[PictureRating]:
+    return db.session.scalars(db.select(PictureRating)
+                              .where(PictureRating.rater_id == rater_id,
+                                     PictureRating.rated_id == object_id)).one_or_none()
+
+
+def get_average_rating_for_profile(user_id: int) -> int:
+    statement = db.session.query(func.avg(ProfileRating.value)).where(ProfileRating.rated_id == user_id)
+    result = db.session.scalar(statement)
+    return int(result) if result else 0
+
+
+def get_average_rating_for_picture(post_id: int) -> int:
+    statement = db.session.query(func.avg(PictureRating.value)).where(PictureRating.rated_id == post_id)
+    result = db.session.scalar(statement)
+    return int(result) if result else 0
