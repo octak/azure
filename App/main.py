@@ -20,6 +20,7 @@ def create_app(config=ProductionConfig):
     for extension in extensions:
         extension.init_app(app)
 
+    db.drop_all()
     db.create_all()
 
     return app
