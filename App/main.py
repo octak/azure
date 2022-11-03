@@ -1,12 +1,12 @@
 from flask import Flask
 
 from App.config import ProductionConfig
-from App.extensions import api, db, jwt
+from App.extensions import db, jwt
 from App.views import index_views, profile_views
 
 views = [index_views, profile_views]
 
-extensions = [api, db, jwt]
+extensions = [db, jwt]
 
 
 def create_app(config=ProductionConfig):
