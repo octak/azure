@@ -6,7 +6,7 @@ from App.main import create_app
 
 
 def delete_all_rows():
-    db.session.query(User).delete()
+    db.session.query(Profile).delete()
     db.session.query(Picture).delete()
     db.session.query(ProfileRating).delete()
     db.session.query(PictureRating).delete()

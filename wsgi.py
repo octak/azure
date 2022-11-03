@@ -1,7 +1,7 @@
 from flask.cli import AppGroup
 
 from App import controllers as cts
-from App.database import get_migrate
+from App.extensions import get_migrate
 from App.main import create_app
 
 app = create_app()
@@ -42,7 +42,7 @@ def initialize_database():
     print('User 1"s Posts :')
     print(u1.pictures)
 
-    print(cts.to_dict_users([u1, u2, u3]))
+    print(cts.to_dict_profiles([u1, u2, u3]))
 
 
 app.cli.add_command(init)

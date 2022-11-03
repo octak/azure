@@ -78,7 +78,7 @@ def test_serialize_user(new_user):
         "average_rating": 0,
         "pictures": {}
     }
-    assert to_dict_user(new_user) == expected_dict
+    assert to_dict_profile(new_user) == expected_dict
 
 
 def test_serialize_users(new_users):
@@ -106,8 +106,8 @@ def test_serialize_users(new_users):
         }
     }
 
-    assert to_dict_users(new_users) == expected_dict
-    assert to_dict_users([]) == {}
+    assert to_dict_profiles(new_users) == expected_dict
+    assert to_dict_profiles([]) == {}
 
 
 def test_serialize_picture(new_picture):

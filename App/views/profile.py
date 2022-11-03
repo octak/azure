@@ -1,151 +1,154 @@
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask import Blueprint, request
+from flask_jwt_extended import create_access_token, jwt_required, current_user
 
-from App import create_profile, get_profile, get_profiles, to_dict_users, to_dict_user, rate_profile, get_picture, \
-    rate_picture, create_picture, to_dict_pictures, generate_feed
+from App.controllers import *
+from App.extensions import jwt
 
 profile_views = Blueprint("profile_views", __name__, template_folder="../templates")
 
 
-def profile_from_identity(identity):
-    return get_profile(identity) if identity else None
+@jwt.user_identity_loader
+def user_identity_lookup(user: Profile):
+    return user.id
 
 
-@profile_views.route("/profile", methods=["POST"])
-def create_new_profile():
-    request_data = request.get_json()
-    username = request_data['username']
-    password = request_data['password']
-
-    if create_profile(username, password):
-        return {'message': 'created'}, 201
-    else:
-        return {'message': 'username unavailable'}, 400
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return get_profile(identity)
 
 
 @profile_views.route("/profiles", methods=["GET"])
-def get_all_profiles():
-    return to_dict_users(get_profiles())
+def all_profiles():
+    """Returns all users."""
+    return to_dict_profiles(get_profiles())
+
+
+@profile_views.route("/profiles/<int:profile_id>", methods=["GET"])
+def one_profile(profile_id):
+    """Returns the user corresponding to provided ID."""
+    user = get_profile(profile_id)
+    if user:
+        return to_dict_profile(user)
+    else:
+        return {'message': 'Profile does not exist.'}, 404
+
+
+@profile_views.route("/profile", methods=["POST"])
+def new_user():
+    """Creates a user."""
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+
+    if create_profile(username, password):
+        return {"message": "User created successfully."}, 200
+    else:
+        return {"message": "Username unavailable."}, 400
+
+
+@profile_views.route("/profiles/<int:user_id>/pictures", methods=["GET"])
+def user_posts(user_id):
+    """Returns all a user's pictures."""
+    user = get_profile(user_id)
+    if user:
+        return to_dict_pictures(user.pictures)
+    else:
+        return {'message': 'Profile does not exist.'}, 404
+
+
+@profile_views.route("/login", methods=["POST"])
+def login():
+    """Authenticates a user and returns a JWT."""
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+
+    user = get_profile(username)
+    if user and user.check_password(password):
+        token = create_access_token(identity=user)
+        return {"token": token}, 200
+    else:
+        return {'message': 'Invalid credentials.'}, 401
 
 
 @profile_views.route("/profile", methods=["GET"])
 @jwt_required()
-def get_active_profile():
-    profile = profile_from_identity(get_jwt_identity())
-    if profile:
-        return to_dict_user(profile)
+def current_user_():
+    """Returns the profile that is currently logged-in."""
+    if current_user:
+        return to_dict_profile(current_user)
     else:
-        return {'message': 'invalid credentials'}, 401
+        return {'message': 'Invalid credentials.'}, 401
 
 
-@profile_views.route("/profiles/<int:profile_id>", methods=["GET"])
-def route_get_profile(profile_id):
-    profile = get_profile(profile_id)
-    return to_dict_user(profile) if profile else ({'message': 'profile does not exist'}, 404)
-
-
-@profile_views.route('/login', methods=['POST'])
-def login():
-    request_data = request.get_json()
-    username = request_data['username']
-    password = request_data['password']
-
-    if username and password:
-        profile = get_profile(username)
-        if profile and profile.check_password(password):
-            token = create_access_token(identity=username)
-            return jsonify(token=token), 201
+@profile_views.route("/profile/pictures", methods=["GET"])
+@jwt_required()
+def current_user_posts():
+    """Returns the posts of the profile that is currently logged-in."""
+    if current_user:
+        return to_dict_pictures(current_user.pictures)
     else:
-        return jsonify({'message': 'INVALID CREDENTIALS'}), 401
-
-
-@profile_views.route('/profiles/rating', methods=['POST'])
-@jwt_required()
-def add_profile_rating():
-    request_data = request.get_json()
-    ratee_id = request_data['ratee_id']
-    value = request_data['value']
-
-    active_profile = profile_from_identity(get_jwt_identity())
-    if not active_profile:
-        return jsonify({'message': 'invalid credentials'}), 401
-
-    if not get_profile(ratee_id):
-        return jsonify({'message': 'profile does not exist'}), 401
-
-    rate_profile(active_profile.id, ratee_id, value)
-
-    return jsonify({'message': 'successful'}), 201
-
-
-@profile_views.route('/pictures/rating', methods=['POST'])
-@jwt_required()
-def add_picture_rating():
-    request_data = request.get_json()
-    ratee_id = request_data['ratee_id']
-    value = request_data['value']
-
-    active_profile = profile_from_identity(get_jwt_identity())
-    if not active_profile:
-        return jsonify({'message': 'invalid credentials'}), 401
-
-    if not get_picture(int(ratee_id)):
-        return jsonify({'message': 'picture does not exist'}), 401
-
-    rate_picture(active_profile.id, ratee_id, value)
-
-    return jsonify({'message': 'successful'}), 201
+        return {'message': 'Invalid credentials.'}, 401
 
 
 @profile_views.route("/picture", methods=["POST"])
 @jwt_required()
-def upload_picture():
-    request_data = request.get_json()
-    url = request_data['url']
-
-    active_profile = profile_from_identity(get_jwt_identity())
-
-    if not active_profile:
-        return jsonify({'message': 'invalid credentials'}), 401
-
-    if not url:
-        return jsonify({'message': 'invalid url'}), 401
-
-    create_picture(active_profile.id, url)
-
-    return jsonify({'message': 'successful'}), 201
-
-
-@profile_views.route("/pictures", methods=["GET"])
-@jwt_required()
-def get_active_profile_pictures():
-    active_profile = profile_from_identity(get_jwt_identity())
-
-    if not active_profile:
-        return {'message': 'invalid credentials'}, 401
-
-    return to_dict_pictures(active_profile.pictures), 200
-
-
-@profile_views.route("/profiles/<int:profile_id>/pictures", methods=["GET"])
-def get_pictures_from_profile(profile_id):
-    profile = get_profile(profile_id)
-    if profile:
-        return to_dict_pictures(profile.pictures)
+def new_current_user_post():
+    """Adds a post to the profile that is currently logged-in."""
+    data = request.get_json()
+    url = data['url']
+    if current_user:
+        create_picture(current_user.id, url)
+        return {'message': 'Successful'}, 401
     else:
-        return {'message': 'profile does not exist'}, 404
+        return {'message': 'Invalid credentials.'}, 401
+
+
+@profile_views.route("/profiles/rating", methods=["POST"])
+@jwt_required()
+def post_user_rating():
+    """Adds or edits a rating for the selected user."""
+    data = request.get_json()
+    ratee_id = data['ratee_id']
+    value = data['value']
+
+    if not current_user:
+        return {'message': 'Invalid credentials.'}, 401
+    if not get_profile(ratee_id):
+        return {'message': 'User does not exist.'}, 404
+
+    rate_profile(current_user.id, ratee_id, value)
+
+    return {'message': 'Successful.'}, 201
+
+
+@profile_views.route("/pictures/rating", methods=["POST"])
+@jwt_required()
+def post_picture_rating():
+    """Adds or edits a rating for the selected post."""
+    data = request.get_json()
+    ratee_id = data['ratee_id']
+    value = data['value']
+
+    if not current_user:
+        return {'message': 'Invalid credentials.'}, 401
+    if not get_picture(ratee_id):
+        return {'message': 'Post does not exist.'}, 404
+
+    rate_picture(current_user.id, ratee_id, value)
+
+    return {'message': 'Successful.'}, 201
 
 
 @profile_views.route("/feed", methods=["GET"])
 @jwt_required()
-def get_feed():
-    active_profile = profile_from_identity(get_jwt_identity())
-
-    if not active_profile:
-        return {'message': 'invalid credentials'}, 401
-
-    feed_listing = generate_feed()
-    if feed_listing:
-        return to_dict_users(feed_listing)
+def feed():
+    if current_user:
+        listing = generate_feed()
+        if listing:
+            return to_dict_profiles(listing)
+        else:
+            return {'message': 'No profiles can be viewed. Check again tomorrow.'}, 401
     else:
-        return {'message': 'no viewable profiles, check again tomorrow'}, 404
+        return {'message': 'Invalid credentials.'}, 401

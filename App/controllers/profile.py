@@ -3,11 +3,9 @@ from typing import Optional
 from multimethod import multimethod
 from sqlalchemy import func
 
-from App.database import db
-from App.models import Picture, PictureRating, User, ProfileRating
+from App.extensions import db
+from App.models import Picture, PictureRating, Profile, ProfileRating
 
-
-# Serialization #######################################################################################################
 
 def to_dict_picture(picture: Picture) -> dict:
     return {
@@ -24,7 +22,7 @@ def to_dict_pictures(picture_list: list) -> dict:
     return pictures
 
 
-def to_dict_user(user: User) -> dict:
+def to_dict_profile(user: Profile) -> dict:
     return {
         "id": user.id,
         "username": user.username,
@@ -34,18 +32,16 @@ def to_dict_user(user: User) -> dict:
     }
 
 
-def to_dict_users(user_list: list) -> dict:
+def to_dict_profiles(user_list: list) -> dict:
     users = {}
     for _, user in enumerate(user_list):
-        users[_] = to_dict_user(user)
+        users[_] = to_dict_profile(user)
     return users
 
 
-# Services ############################################################################################################
-
-def create_profile(username: str, password: str) -> Optional[User]:
+def create_profile(username: str, password: str) -> Optional[Profile]:
     if not get_profile(username):
-        user = User(username=username, password=password)
+        user = Profile(username=username, password=password)
         db.session.add(user)
         db.session.commit()
         return user
@@ -63,8 +59,8 @@ def create_picture(user_id: int, url: str) -> Optional[Picture]:
 
 
 def rate_profile(rater_id, rated_id, value):
-    rater: User = get_profile(rater_id)
-    rated: User = get_profile(rated_id)
+    rater: Profile = get_profile(rater_id)
+    rated: Profile = get_profile(rated_id)
     if not rater or not rated:
         return
     rating = get_profile_rating(rater_id, rated_id)
@@ -102,19 +98,18 @@ def generate_feed():
     return feed
 
 
-# Selectors ###########################################################################################################
 def get_profiles() -> list:
-    return db.session.scalars(db.select(User)).all()
+    return db.session.scalars(db.select(Profile)).all()
 
 
 @multimethod
-def get_profile(user_id: int) -> Optional[User]:
-    return db.session.scalars(db.select(User).where(User.id == user_id)).one_or_none()
+def get_profile(user_id: int) -> Optional[Profile]:
+    return db.session.scalars(db.select(Profile).where(Profile.id == user_id)).one_or_none()
 
 
 @multimethod
-def get_profile(username: str) -> Optional[User]:
-    return db.session.scalars(db.select(User).where(User.username == username)).one_or_none()
+def get_profile(username: str) -> Optional[Profile]:
+    return db.session.scalars(db.select(Profile).where(Profile.username == username)).one_or_none()
 
 
 def get_picture(post_id: int) -> Optional[Picture]:
@@ -134,12 +129,10 @@ def get_picture_rating(rater_id: int, object_id: int) -> Optional[PictureRating]
 
 
 def get_average_rating_for_profile(user_id: int) -> int:
-    statement = db.session.query(func.avg(ProfileRating.value)).where(ProfileRating.rated_id == user_id)
-    result = db.session.scalar(statement)
+    result = db.session.query(func.avg(ProfileRating.value)).where(ProfileRating.rated_id == user_id).scalar()
     return int(result) if result else 0
 
 
 def get_average_rating_for_picture(post_id: int) -> int:
-    statement = db.session.query(func.avg(PictureRating.value)).where(PictureRating.rated_id == post_id)
-    result = db.session.scalar(statement)
+    result = db.session.query(func.avg(PictureRating.value)).where(PictureRating.rated_id == post_id).scalar()
     return int(result) if result else 0

@@ -2,14 +2,14 @@ from datetime import datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from App.database import db
+from App.extensions import db
 
 tiers = [1, 2, 3, 4, 5]
 views = [2, 4, 6, 8, 10]
 points = [2, 4, 6, 8, 10]
 
 
-class User(db.Model):
+class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
