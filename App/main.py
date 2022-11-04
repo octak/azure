@@ -1,3 +1,4 @@
+import sqlalchemy.exc
 from flask import Flask
 
 from App.config import ProductionConfig
@@ -20,7 +21,9 @@ def create_app(config=ProductionConfig):
     for extension in extensions:
         extension.init_app(app)
 
-    # db.drop_all()
-    db.create_all()
+    try:
+        db.create_all()
+    except sqlalchemy.exc.OperationalError:
+        pass
 
     return app
