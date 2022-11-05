@@ -42,7 +42,7 @@ def new_user():
     password = data['password']
 
     if create_profile(username, password):
-        return {"message": "User created successfully."}, 200
+        return {"message": "Profile created successfully."}, 200
     else:
         return {"message": "Username unavailable."}, 400
 
@@ -100,7 +100,7 @@ def new_current_user_post():
     url = data['url']
     if current_user:
         create_picture(current_user.id, url)
-        return {'message': 'Successful'}, 401
+        return {'message': 'Successful.'}, 401
     else:
         return {'message': 'Invalid credentials.'}, 401
 
@@ -116,7 +116,7 @@ def post_user_rating():
     if not current_user:
         return {'message': 'Invalid credentials.'}, 401
     if not get_profile(ratee_id):
-        return {'message': 'User does not exist.'}, 404
+        return {'message': 'Profile does not exist.'}, 404
 
     rate_profile(current_user.id, ratee_id, value)
 
@@ -134,7 +134,7 @@ def post_picture_rating():
     if not current_user:
         return {'message': 'Invalid credentials.'}, 401
     if not get_picture(ratee_id):
-        return {'message': 'Post does not exist.'}, 404
+        return {'message': 'Picture does not exist.'}, 404
 
     rate_picture(current_user.id, ratee_id, value)
 
